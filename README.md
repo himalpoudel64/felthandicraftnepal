@@ -132,11 +132,11 @@ Measured with Lighthouse 12.8 (mobile, default simulated throttling) on a local 
 
 | Page | Performance | Accessibility | Best Practices | SEO | LCP | CLS |
 | --- | --- | --- | --- | --- | --- | --- |
-| Home | 90 | 100 | 100 | 100 | 3.5 s | 0 |
-| Category | 96 | 100 | 100 | 100 | 2.7 s | 0 |
-| Product | 95 | 100 | 100 | 100 | 2.9 s | 0 |
+| Home | 76 to 90 | 100 | 100 | 100 | 3.5 to 3.7 s | 0 |
+| Category | 92 to 96 | 100 | 100 | 100 | 2.7 to 2.9 s | 0 |
+| Product | 89 to 95 | 100 | 100 | 100 | 2.8 to 3.0 s | 0 |
 
-The home page is below the 95 target. Its LCP is the hero photograph, and with the collection tiles just below it, many images load early. Measure again on the live Cloudflare URL with PageSpeed Insights, because that is the number that counts, and because Sanity's CDN serves different files from the local ones.
+Ranges are from three runs on a development laptop, where scores moved with machine load. The home page is below the 95 target. Its LCP is the hero photograph, and with the collection tiles just below it, many images load early. Measure again on the live Cloudflare URL with PageSpeed Insights, because that is the number that counts, and because Sanity's CDN serves different files from the local ones.
 
 First-load JavaScript is about 136 to 139 KB gzipped, and most of that is the Next.js and React runtime. Sanity's client is build-time only and does not reach the browser.
 
