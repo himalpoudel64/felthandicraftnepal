@@ -1,0 +1,2 @@
+# Cloudflare Pages redirects. One per line: /old-path/ /new-path/ 301
+# Add entries here if a page or product URL ever changes.
