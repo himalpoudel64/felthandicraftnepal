@@ -90,7 +90,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                     style={slide.position ? { objectPosition: slide.position } : undefined}
                   />
                 )
-              : <Placeholder tone={1} className="h-full w-full" />}
+              : <Placeholder tone={1} className="h-full w-full" labelClassName="top-24" />}
           </div>
         ))}
       </div>

@@ -7,14 +7,16 @@ export function Placeholder({
   aspect,
   tone = 0,
   className = "",
+  labelClassName = "top-2",
 }: {
   aspect?: number;
   tone?: number;
   className?: string;
+  labelClassName?: string;
 }) {
   return (
     <div className={`relative ${TONES[tone % TONES.length]} ${className}`} style={aspect ? { aspectRatio: aspect } : undefined}>
-      <span className="absolute bottom-2 left-2 bg-ivory px-1.5 text-xs leading-5 text-ink">Placeholder</span>
+      <span className={`absolute left-2 bg-ivory px-1.5 text-xs leading-5 text-ink ${labelClassName}`}>Placeholder</span>
     </div>
   );
 }
@@ -43,7 +45,7 @@ export function SanityImage({
       loading={priority ? "eager" : "lazy"}
       fetchPriority={priority ? "high" : undefined}
       decoding="async"
-      className={`block h-auto w-full ${className}`}
+      className={`block h-auto w-full bg-sand ${className}`}
     />
   );
 }

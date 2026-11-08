@@ -214,11 +214,6 @@
     padding-left: 1.25em;
   }
 
-  .prose-cms a {
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-
   /* Image tiles: slow zoom inside a fixed frame, so no layout moves. */
   .tile-frame {
     overflow: hidden;
@@ -257,7 +252,7 @@
 @keyframes header-solid {
   0%,
   80% {
-    background-color: rgb(42 31 27 / 0.28);
+    background-color: rgb(42 31 27 / 0.45);
     color: var(--color-ivory);
     border-bottom-color: transparent;
   }

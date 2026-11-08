@@ -69,6 +69,7 @@ export const richText = {
           { title: "Bold", value: "strong" },
           { title: "Italic", value: "em" },
         ],
+        annotations: [],
       },
     },
   ],

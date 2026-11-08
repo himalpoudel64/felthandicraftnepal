@@ -4,7 +4,7 @@ Bishnu Laxmi Felt Handicraft is an independent artisan label. The site should re
 
 ## Status of the brief
 
-`brief.md` was not available when this site was built. Section order and copy come from the build prompt. Category names are assumptions. Everything that would need real knowledge of the business is labelled "Sample text" in the seed data. The few fixed lines in `lib/copy.ts` restate only what the build prompt says about the business and should be checked against the real brief.
+`brief.md` was not available when this site was built. Section order and copy come from the build prompt. The seven category names (Purse, Bags, Hats, Ornaments, Key Rings and Key Chains, Hotpot, Tea Coaster) were supplied by the client. Everything that would need real knowledge of the business is labelled "Sample text" in the seed data. The few fixed lines in `lib/copy.ts` restate only what the build prompt says about the business and should be checked against the real brief.
 
 ## Colour tokens
 
@@ -16,20 +16,20 @@ Defined in `app/globals.css` as CSS variables through Tailwind's `@theme`.
 | `paper` | `#FBF6EC` | Form fields, dialog | n/a |
 | `sand` | `#E8DCC6` | Quiet panels | n/a |
 | `rule` | `#CFC1A8` | Hairlines, input-adjacent rules | decorative |
-| `line` | `#7D6B5C` | Form control borders | 4.2:1 |
+| `line` | `#7D6B5C` | Form control borders | 4.4:1 |
 | `ink` | `#2A1F1B` | Text | 13.9:1 |
-| `ink-soft` | `#5A4A41` | Secondary text | 7.2:1 |
-| `burgundy` | `#6B1D2A` | Brand: hero plate, primary button, sparingly | 10.1:1 |
+| `ink-soft` | `#5A4A41` | Secondary text | 7.3:1 |
+| `burgundy` | `#6B1D2A` | Brand: hero plate, primary button, sparingly | 9.9:1 |
 | `terracotta` | `#C4572F` | Fills and rules only | 3.8:1, fails for body text |
 | `terracotta-ink` | `#A3401C` | Terracotta as text and links | 5.5:1 |
-| `mustard` | `#D9A441` | Fills, and text on burgundy, forest or ink only | 1.9:1 on ivory, never text there. 5.1:1 on burgundy |
-| `forest` | `#2F4A3A` | Impact band | 8.8:1 |
+| `mustard` | `#D9A441` | Fills, and text on burgundy or ink only | 1.95:1 on ivory and 4.3:1 on forest, so never text there. 5.1:1 on burgundy |
+| `forest` | `#2F4A3A` | Impact band | 8.4:1 |
 
 No gradients. Dark bands are flat colour. Text never sits directly on a photograph: the hero headline is on a solid burgundy plate that overlaps the image. The header sits over the hero on a flat tint.
 
 ## Type
 
-Fraunces (headings) and DM Sans (UI and body), self-hosted through `next/font`.
+Fraunces 400 (headings) and DM Sans 400 and 500 (UI and body), self-hosted through `next/font`. The variable Fraunces with optical sizing cost 68 KB against 18 KB for the static weight, and pushed LCP over budget, so the static weight is used.
 
 | Step | Size | Used for |
 | --- | --- | --- |

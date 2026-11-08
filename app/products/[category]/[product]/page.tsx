@@ -109,7 +109,7 @@ export default async function ProductPage({ params }: Params) {
 
       {related.length > 0 && (
         <section className="border-t border-rule py-14 mt-20 lg:mt-32 lg:py-20">
-          <h2 className="mb-8 text-section">More {product.category.title.toLowerCase()}</h2>
+          <h2 className="mb-8 text-section">More from {product.category.title}</h2>
           <ul className="grid grid-cols-2 gap-x-3 gap-y-10 lg:grid-cols-4 lg:gap-x-6">
             {related.map((item, i) => (
               <li key={item._id} data-reveal>

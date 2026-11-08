@@ -57,16 +57,19 @@ export default async function CategoryPage({ params }: Params) {
       </div>
 
       {category.products.length > 0 ? (
-        <ul className="grid-12 gap-y-10 pt-14 lg:gap-y-16 lg:pt-24">
-          {category.products.map((product, i) => {
-            const cell = LAYOUT[i % LAYOUT.length] as (typeof LAYOUT)[number];
-            return (
-              <li key={product._id} className={cell.span} data-reveal>
-                <ProductCard product={product} sizes={cell.sizes} aspect={cell.aspect} tone={i} />
-              </li>
-            );
-          })}
-        </ul>
+        <>
+          <h2 className="sr-only">Products in {category.title}</h2>
+          <ul className="grid-12 gap-y-10 pt-14 lg:gap-y-16 lg:pt-24">
+            {category.products.map((product, i) => {
+              const cell = LAYOUT[i % LAYOUT.length] as (typeof LAYOUT)[number];
+              return (
+                <li key={product._id} className={cell.span} data-reveal>
+                  <ProductCard product={product} sizes={cell.sizes} aspect={cell.aspect} tone={i} />
+                </li>
+              );
+            })}
+          </ul>
+        </>
       ) : (
         <p className="pt-14">New pieces for this category are on their way.</p>
       )}

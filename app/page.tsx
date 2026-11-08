@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata({
     title: "Handmade Felt Products from Nepal | Bishnu Laxmi Felt Handicraft",
     description:
-      "Handmade felt bags, hats, coasters and home pieces from Nepal, made by women artisans building skills and income. Browse the collection and enquire.",
+      "Handmade felt purses, bags, hats, ornaments and tea coasters from Nepal, made by women artisans building skills and income. Browse and enquire.",
     path: "/",
     image: home.heroSlides?.[0],
     settings,
@@ -101,7 +101,7 @@ export default async function HomePage() {
       {(home.impactItems?.length ?? 0) > 0 && (
         <section className="bg-forest py-20 text-ivory lg:py-28">
           <div className="wrap">
-            <h2 className="max-w-xl text-lead !font-sans tracking-normal text-mustard">{copy.impact.title}</h2>
+            <h2 className="max-w-xl text-lead !font-sans tracking-normal">{copy.impact.title}</h2>
             <ul className="mt-8">
               {home.impactItems?.map((item) => (
                 <li key={item.title} className="grid-12 items-baseline gap-y-3 border-t border-ivory/30 py-8 lg:py-10" data-reveal>
