@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { categoryPath } from "@/lib/paths";
 import { getContent } from "@/lib/sanity";
+
+export const metadata: Metadata = {
+  title: { absolute: "Page not found | Bishnu Laxmi Felt Handicraft" },
+  robots: { index: false },
+};
 
 export default async function NotFound() {
   const { categories } = await getContent();

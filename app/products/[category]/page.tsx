@@ -1,10 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { JsonLd } from "@/components/JsonLd";
 import { PortableText } from "@/components/PortableText";
 import { ProductCard } from "@/components/ProductCard";
 import { categoryPath } from "@/lib/paths";
 import { getContent } from "@/lib/sanity";
+import { breadcrumbLd, categoryMetadata, collectionLd } from "@/lib/seo";
 
 export const dynamicParams = false;
 
@@ -13,6 +16,13 @@ type Params = { params: Promise<{ category: string }> };
 export async function generateStaticParams() {
   const { categories } = await getContent();
   return categories.map((category) => ({ category: category.slug }));
+}
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const { category: slug } = await params;
+  const { categories, settings } = await getContent();
+  const category = categories.find((c) => c.slug === slug);
+  return category ? categoryMetadata(category, settings) : {};
 }
 
 /** Rows of 6 + 5 (offset) and 3 + 5 + 4, so the grid never reads as uniform cards. */
@@ -30,16 +40,17 @@ export default async function CategoryPage({ params }: Params) {
   const category = categories.find((c) => c.slug === slug);
   if (!category) notFound();
   const others = categories.filter((c) => c._id !== category._id);
+  const crumbs = [
+    { name: "Home", path: "/" },
+    { name: "Products", path: "/products/" },
+    { name: category.title, path: categoryPath(category) },
+  ];
 
   return (
     <div className="wrap">
-      <Breadcrumbs
-        items={[
-          { name: "Home", path: "/" },
-          { name: "Products", path: "/products/" },
-          { name: category.title, path: categoryPath(category) },
-        ]}
-      />
+      <JsonLd data={breadcrumbLd(crumbs)} />
+      <JsonLd data={collectionLd(category)} />
+      <Breadcrumbs items={crumbs} />
       <div className="grid-12 gap-y-6 pt-6">
         <h1 className="col-span-12 text-title lg:col-span-6">{category.title}</h1>
         <PortableText value={category.intro} className="col-span-12 lg:col-span-5 lg:col-start-8 lg:pt-3" />

@@ -1,7 +1,21 @@
+import type { Metadata } from "next";
 import { EnquiryForm } from "@/components/EnquiryForm";
+import { JsonLd } from "@/components/JsonLd";
 import { enquirySettings, interestGroups } from "@/lib/enquiry";
 import { absoluteUrl } from "@/lib/paths";
 import { getContent } from "@/lib/sanity";
+import { breadcrumbLd, pageMetadata } from "@/lib/seo";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { settings } = await getContent();
+  return pageMetadata({
+    title: "Contact Us and Wholesale Enquiries | Bishnu Laxmi Felt Handicraft",
+    description:
+      "Enquire about handmade felt products from Nepal, custom colours or wholesale felt handicrafts by form, email or WhatsApp.",
+    path: "/contact/",
+    settings,
+  });
+}
 
 export default async function ContactPage() {
   const content = await getContent();
@@ -17,6 +31,7 @@ export default async function ContactPage() {
 
   return (
     <div className="wrap grid-12 gap-y-12 py-14 lg:py-24">
+      <JsonLd data={breadcrumbLd([{ name: "Home", path: "/" }, { name: "Contact", path: "/contact/" }])} />
       <div className="col-span-12 lg:col-span-5">
         <h1 className="text-title">Contact us</h1>
         <p className="mt-6 max-w-md text-lead">

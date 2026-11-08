@@ -1,13 +1,31 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import { JsonLd } from "@/components/JsonLd";
 import { PortableText } from "@/components/PortableText";
 import { SanityImage } from "@/components/SanityImage";
 import { getContent } from "@/lib/sanity";
+import { breadcrumbLd, describe, pageMetadata } from "@/lib/seo";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { about, settings } = await getContent();
+  return pageMetadata({
+    title: "About Us: Women Artisans of Nepal | Bishnu Laxmi Felt Handicraft",
+    description: describe(
+      about.intro ||
+        "Bishnu Laxmi Felt Handicraft is a Nepal-based maker of handmade felt, giving women skills, employment and income.",
+    ),
+    path: "/about/",
+    image: about.images?.[0],
+    settings,
+  });
+}
 
 export default async function AboutPage() {
   const { about, settings } = await getContent();
 
   return (
     <>
+      <JsonLd data={breadcrumbLd([{ name: "Home", path: "/" }, { name: "About Us", path: "/about/" }])} />
       <section className="wrap grid-12 pt-14 lg:pt-24">
         <h1 className="col-span-12 text-title lg:col-span-10">About {settings.businessName}</h1>
         {about.intro && <p className="col-span-12 mt-6 text-lead lg:col-span-6 lg:col-start-7 lg:mt-10">{about.intro}</p>}

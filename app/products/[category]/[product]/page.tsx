@@ -1,5 +1,7 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { JsonLd } from "@/components/JsonLd";
 import { PortableText } from "@/components/PortableText";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductGallery } from "@/components/ProductGallery";
@@ -8,6 +10,7 @@ import { enquirySettings } from "@/lib/enquiry";
 import { formatNPR } from "@/lib/format";
 import { absoluteUrl, categoryPath, productPath } from "@/lib/paths";
 import { getContent } from "@/lib/sanity";
+import { breadcrumbLd, productLd, productMetadata } from "@/lib/seo";
 
 export const dynamicParams = false;
 
@@ -16,6 +19,13 @@ type Params = { params: Promise<{ category: string; product: string }> };
 export async function generateStaticParams() {
   const { products } = await getContent();
   return products.map((product) => ({ category: product.category.slug, product: product.slug }));
+}
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const { category, product: slug } = await params;
+  const { products, settings } = await getContent();
+  const product = products.find((p) => p.slug === slug && p.category.slug === category);
+  return product ? productMetadata(product, settings) : {};
 }
 
 export default async function ProductPage({ params }: Params) {
@@ -28,17 +38,18 @@ export default async function ProductPage({ params }: Params) {
     .filter((p) => p._id !== product._id && p.category._id === product.category._id)
     .slice(0, 4);
   const path = productPath(product);
+  const crumbs = [
+    { name: "Home", path: "/" },
+    { name: "Products", path: "/products/" },
+    { name: product.category.title, path: categoryPath(product.category) },
+    { name: product.name, path },
+  ];
 
   return (
     <div className="wrap">
-      <Breadcrumbs
-        items={[
-          { name: "Home", path: "/" },
-          { name: "Products", path: "/products/" },
-          { name: product.category.title, path: categoryPath(product.category) },
-          { name: product.name, path },
-        ]}
-      />
+      <JsonLd data={breadcrumbLd(crumbs)} />
+      <JsonLd data={productLd(product, content.settings)} />
+      <Breadcrumbs items={crumbs} />
 
       <div className="grid-12 gap-y-8 pt-2">
         <div className="col-span-12 lg:col-span-7">

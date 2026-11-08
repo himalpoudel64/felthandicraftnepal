@@ -1,16 +1,36 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { JsonLd } from "@/components/JsonLd";
 import { SanityImage } from "@/components/SanityImage";
 import { plainText, truncate } from "@/lib/format";
 import { categoryPath, productPath } from "@/lib/paths";
 import { getContent } from "@/lib/sanity";
+import { breadcrumbLd, pageMetadata } from "@/lib/seo";
+
+const CRUMBS = [
+  { name: "Home", path: "/" },
+  { name: "Products", path: "/products/" },
+];
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { settings } = await getContent();
+  return pageMetadata({
+    title: "Handmade Felt Products from Nepal | All Categories | Bishnu Laxmi",
+    description:
+      "Felt bags and purses, hats, slippers, coasters, rugs and home pieces, handmade in Nepal by women artisans. Retail and wholesale enquiries welcome.",
+    path: "/products/",
+    settings,
+  });
+}
 
 export default async function ProductsPage() {
   const { categories } = await getContent();
 
   return (
     <div className="wrap pb-20 lg:pb-32">
-      <Breadcrumbs items={[{ name: "Home", path: "/" }, { name: "Products", path: "/products/" }]} />
+      <JsonLd data={breadcrumbLd(CRUMBS)} />
+      <Breadcrumbs items={CRUMBS} />
       <h1 className="max-w-5xl pt-6 text-title">Handmade felt products from Nepal</h1>
 
       <div className="mt-14 lg:mt-24">

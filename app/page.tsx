@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { preload } from "react-dom";
 import { CategoryGrid } from "@/components/CategoryGrid";
@@ -10,8 +11,21 @@ import { enquirySettings, interestGroups } from "@/lib/enquiry";
 import { imageProps } from "@/lib/image-loader";
 import { absoluteUrl } from "@/lib/paths";
 import { getContent } from "@/lib/sanity";
+import { pageMetadata } from "@/lib/seo";
 
 const HERO_WIDTHS = [640, 828, 1080, 1440, 1920, 2400];
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { settings, home } = await getContent();
+  return pageMetadata({
+    title: "Handmade Felt Products from Nepal | Bishnu Laxmi Felt Handicraft",
+    description:
+      "Handmade felt bags, hats, coasters and home pieces from Nepal, made by women artisans building skills and income. Browse the collection and enquire.",
+    path: "/",
+    image: home.heroSlides?.[0],
+    settings,
+  });
+}
 
 export default async function HomePage() {
   const content = await getContent();
