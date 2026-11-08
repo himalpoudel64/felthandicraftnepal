@@ -33,7 +33,7 @@ Fraunces (headings) and DM Sans (UI and body), self-hosted through `next/font`.
 
 | Step | Size | Used for |
 | --- | --- | --- |
-| `display` | `clamp(2.75rem, 7.2vw, 6.25rem)` | Hero headline |
+| `display` | `clamp(2.375rem, 5.6vw, 5.25rem)` | Hero headline, on its plate |
 | `h1` | `clamp(2.5rem, 6vw, 5rem)` | Page titles |
 | `h2` | `clamp(2rem, 4.2vw, 3.5rem)` | Section titles |
 | `h3` | `clamp(1.375rem, 2vw, 1.75rem)` | Sub-sections, process steps |

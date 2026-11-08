@@ -18,7 +18,7 @@
   --font-serif: var(--font-fraunces), Georgia, "Times New Roman", serif;
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
 
-  --text-display: clamp(2.75rem, 7.2vw, 6.25rem);
+  --text-display: clamp(2.375rem, 5.6vw, 5.25rem);
   --text-display--line-height: 0.98;
   --text-title: clamp(2.5rem, 6vw, 5rem);
   --text-title--line-height: 1.02;

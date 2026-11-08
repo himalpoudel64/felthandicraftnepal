@@ -1,5 +1,8 @@
 import type { ReactNode } from "react";
 import { DM_Sans, Fraunces } from "next/font/google";
+import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
+import { getContent } from "@/lib/sanity";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -17,7 +20,8 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const { settings, categories } = await getContent();
   return (
     <html lang="en" className={`${fraunces.variable} ${dmSans.variable}`}>
       <body>
@@ -27,9 +31,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         >
           Skip to main content
         </a>
+        <Header settings={settings} categories={categories} />
         <main id="main" className="flex-1">
           {children}
         </main>
+        <Footer settings={settings} categories={categories} />
       </body>
     </html>
   );
