@@ -45,7 +45,8 @@ export function SanityImage({
       loading={priority ? "eager" : "lazy"}
       fetchPriority={priority ? "high" : undefined}
       decoding="async"
-      className={`block h-auto w-full bg-sand ${className}`}
+      style={aspect ? { aspectRatio: aspect } : undefined}
+      className={`block h-auto w-full bg-sand object-cover ${className}`}
     />
   );
 }

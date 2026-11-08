@@ -40,10 +40,23 @@ async function fetchFromSanity(id: string): Promise<Raw> {
 /** Lets the site render before a Sanity project exists. Mirrors the shape of siteQuery. */
 async function readSeed(file: string): Promise<Raw> {
   const text = await readFile(file, "utf8");
+  const manifest = JSON.parse(
+    await readFile(path.join(process.cwd(), "studio/seed/images.json"), "utf8"),
+  ) as Record<string, { width: number; height: number }>;
+
+  // Seed images use Sanity's import syntax. Here they resolve to the variants in public/seed.
   const docs = text
     .split("\n")
     .filter(Boolean)
-    .map((line) => JSON.parse(line) as Record<string, unknown> & { _id: string; _type: string });
+    .map(
+      (line) =>
+        JSON.parse(line, (_key, value: unknown) => {
+          const asset = (value as { _sanityAsset?: string } | null)?._sanityAsset;
+          const name = asset?.match(/images\/(.+)\.jpg$/)?.[1];
+          const size = name ? manifest[name] : undefined;
+          return name && size ? { ...(value as object), asset: { _id: `local:${name}`, ...size } } : value;
+        }) as Record<string, unknown> & { _id: string; _type: string },
+    );
 
   const slug = (doc: Record<string, unknown>) => (doc.slug as { current: string }).current;
   const order = (doc: Record<string, unknown>) => Number(doc.sortOrder ?? 999999);
@@ -95,6 +108,7 @@ function normalise(raw: Raw): Content {
   const productsById = new Map(products.map((p) => [p._id, p]));
   const chosen = (raw.home?.featuredProducts ?? []).flatMap((id) => productsById.get(id) ?? []);
   const featured = (chosen.length ? chosen : products.filter((p) => p.featured)).slice(0, 8);
+  const more = products.filter((p) => p.images?.[0]?.asset && !featured.includes(p));
 
   return {
     settings: raw.settings,
@@ -103,6 +117,7 @@ function normalise(raw: Raw): Content {
       heroSlides: raw.home?.heroSlides ?? [],
       impactItems: raw.home?.impactItems ?? [],
       featured,
+      more,
     },
     about: raw.about ?? {},
     categories,
@@ -145,6 +160,10 @@ export function reportContentProblems({ settings, home, about, categories, produ
     p.images?.forEach((image, i) => check(`Product "${p.name}" photo ${i + 1}`, image));
   });
 
+  const samplePrices = products.filter((p) => p.sizes.some((s) => /sample/i.test(s.label)));
+  if (samplePrices.length) {
+    console.warn(`\n[content] ${samplePrices.length} products still show a sample price: ${samplePrices.map((p) => p.name).join(", ")}`);
+  }
   if (usingSeed()) console.warn("\n[content] Built from the sample seed file, not from Sanity.");
   if (!process.env.WEB3FORMS_KEY) console.warn("[content] WEB3FORMS_KEY is not set: forms fall back to email links.");
   if (problems.length) {

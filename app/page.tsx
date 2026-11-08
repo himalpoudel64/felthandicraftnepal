@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { preload } from "react-dom";
+import { preconnect, preload } from "react-dom";
 import { CategoryGrid } from "@/components/CategoryGrid";
 import { EnquiryForm } from "@/components/EnquiryForm";
 import { HeroCarousel, type HeroSlide } from "@/components/HeroCarousel";
@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata({
     title: "Handmade Felt Products from Nepal | Bishnu Laxmi Felt Handicraft",
     description:
-      "Handmade felt purses, bags, hats, ornaments and tea coasters from Nepal, made by women artisans building skills and income. Browse and enquire.",
+      "Handmade felt ornaments, animals, key rings, hotpot mats and tea coasters from Nepal, made by women artisans building skills and income.",
     path: "/",
     image: home.heroSlides?.[0],
     settings,
@@ -40,6 +40,7 @@ export default async function HomePage() {
 
   const lcp = slides[0]?.img;
   if (lcp) {
+    if (lcp.src.startsWith("https://cdn.sanity.io")) preconnect("https://cdn.sanity.io");
     preload(lcp.src, { as: "image", imageSrcSet: lcp.srcSet, imageSizes: lcp.sizes, fetchPriority: "high" });
   }
 
@@ -92,6 +93,19 @@ export default async function HomePage() {
             {home.featured.map((product, i) => (
               <li key={product._id} className="lg:even:mt-24" data-reveal>
                 <ProductCard product={product} sizes="(min-width: 1024px) 28vw, 50vw" tone={i + 3} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {home.more.length > 0 && (
+        <section className="wrap pb-20 lg:pb-32">
+          <h2 className="mb-8 border-t border-rule pt-8 text-sub">{copy.featured.more}</h2>
+          <ul className="grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 lg:grid-cols-5 lg:gap-x-6">
+            {home.more.map((product) => (
+              <li key={product._id} data-reveal>
+                <ProductCard product={product} sizes="(min-width: 1024px) 19vw, (min-width: 640px) 32vw, 50vw" aspect={1} />
               </li>
             ))}
           </ul>

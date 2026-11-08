@@ -85,7 +85,6 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                     alt={slide.img.alt}
                     loading={i === 0 ? "eager" : "lazy"}
                     fetchPriority={i === 0 ? "high" : undefined}
-                    decoding={i === 0 ? "sync" : "async"}
                     className="h-full w-full object-cover"
                     style={slide.position ? { objectPosition: slide.position } : undefined}
                   />

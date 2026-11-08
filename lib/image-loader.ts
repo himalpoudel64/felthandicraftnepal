@@ -1,3 +1,4 @@
+import { absoluteUrl } from "./paths";
 import type { ImageData } from "./types";
 
 const CDN = "https://cdn.sanity.io/images";
@@ -55,10 +56,16 @@ function assetPath(assetId: string): string {
   return assetId.replace(/^image-/, "").replace(/-([a-z0-9]+)$/i, ".$1");
 }
 
+/** Seed photographs have pre-built variants in public/seed, so widths must match a file. */
+const localName = (image: ImageData) =>
+  image.asset?._id.startsWith("local:") ? image.asset._id.slice("local:".length) : null;
+
 function buildUrl(image: ImageData, rect: Rect, width: number): string {
   const project = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? "";
   const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
   const asset = image.asset as NonNullable<ImageData["asset"]>;
+  const local = localName(image);
+  if (local) return `/seed/${local}-${width}.webp`;
   const height = Math.round((width * rect.height) / rect.width);
   const params = new URLSearchParams();
   if (rect.width !== asset.width || rect.height !== asset.height) {
@@ -81,8 +88,9 @@ export function imageProps(
   const rect = cropRect(image, options.aspect);
   if (!rect) return null;
 
-  const fits = (options.widths ?? DEFAULT_WIDTHS).filter((width) => width < rect.width);
-  const widths = [...fits, rect.width];
+  const maxWidth = localName(image) ? (image.asset as { width: number }).width : rect.width;
+  const fits = (options.widths ?? DEFAULT_WIDTHS).filter((width) => width < maxWidth);
+  const widths = [...fits, maxWidth];
   const largest = widths[widths.length - 1] as number;
   const fallback = widths.find((width) => width >= 1080) ?? largest;
 
@@ -99,6 +107,8 @@ export function imageProps(
 /** A single 1200×630 URL for Open Graph and Twitter cards. */
 export function ogImageUrl(image: ImageData | undefined): string | undefined {
   if (!image) return undefined;
+  const local = localName(image);
+  if (local) return `/seed/${local}-og.jpg`;
   const rect = cropRect(image, 1200 / 630);
   return rect ? buildUrl(image, rect, 1200) : undefined;
 }
@@ -106,6 +116,8 @@ export function ogImageUrl(image: ImageData | undefined): string | undefined {
 /** An uncropped URL, used for structured data. */
 export function plainImageUrl(image: ImageData | undefined, width = 1200): string | undefined {
   if (!image) return undefined;
+  const local = localName(image);
+  if (local) return absoluteUrl(`/seed/${local}-og.jpg`);
   const rect = cropRect(image);
   return rect ? buildUrl(image, rect, Math.min(width, rect.width)) : undefined;
 }

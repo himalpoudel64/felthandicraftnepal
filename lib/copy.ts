@@ -12,7 +12,7 @@ export const copy = {
   },
   about: { title: "Wool, water, soap and skilled hands", link: "Read our story" },
   collection: { title: "The collection", link: "See every product" },
-  featured: { title: "Pieces to start with", link: "Browse all products" },
+  featured: { title: "Pieces to start with", link: "Browse all products", more: "More from the workshop" },
   impact: { title: "What the work makes possible" },
   contact: {
     title: "Ask us about a piece, an order or wholesale",

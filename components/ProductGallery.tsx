@@ -18,7 +18,7 @@ export function ProductGallery({ images, name }: { images: ImageData[] | undefin
           <SanityImage
             image={image}
             priority={i === 0}
-            aspect={4 / 5}
+            aspect={image?.asset ? undefined : 4 / 5}
             tone={i}
             sizes={i === 0 ? "(min-width: 1024px) 55vw, 84vw" : "(min-width: 1024px) 27vw, 84vw"}
           />

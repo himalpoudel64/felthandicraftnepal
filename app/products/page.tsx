@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata({
     title: "Handmade Felt Products from Nepal | All Categories | Bishnu Laxmi",
     description:
-      "Felt purses, bags, hats, ornaments, key rings, hotpot pieces and tea coasters, handmade in Nepal by women artisans. Retail and wholesale enquiries welcome.",
+      "Felt ornaments, animals, key rings, hotpot mats, tea coasters, purses, bags and hats, handmade in Nepal by women artisans. Wholesale enquiries welcome.",
     path: "/products/",
     settings,
   });

@@ -7,7 +7,7 @@ On the left of the Studio you will see:
 - **Site Settings:** your name, email, phone, WhatsApp number, address, logo
 - **Home Page:** the large images at the top, featured products, impact text
 - **About Page:** your story, mission, vision, process and photos
-- **Categories:** Purse, Bags, Hats, Ornaments and so on
+- **Categories:** Ornaments, Animals and Figures, Purse, Bags, Hats and so on
 - **Products:** open a category to see the products inside it
 
 ## The most important thing to know
@@ -61,7 +61,8 @@ If you click the photo's crop icon you can set the most important point in the p
 
 ## Good to know
 
-- **Sample content:** anything marked "Sample" was put there so the website could be built. Please replace it all before you tell people about the site, including the sample prices.
+- **Sample content:** anything marked "Sample" was put there so the website could be built. Please replace it all before you tell people about the site.
+- **Prices:** every product shows a sample price of NPR 450 until you set the real one. Open each product, change the size name from "One size (sample price)" to the real size, type the real price, and press Publish.
 - **Coloured blocks marked "Placeholder":** these mean a photo has not been added yet.
 - **WhatsApp buttons** only appear once you add your number in **Site Settings**. Use digits only, starting with the country code: 977 and then your number, with no plus sign or spaces.
 - **Enquiries** from the website arrive at your email address. They are not stored in the Studio.

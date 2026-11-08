@@ -11,7 +11,8 @@ const TILES = [
   { span: "col-span-12 lg:col-span-8", aspect: 8 / 5, sizes: "(min-width: 1024px) 66vw, 100vw" },
   { span: "col-span-6 lg:col-span-3", aspect: 3 / 4, sizes: "(min-width: 1024px) 24vw, 50vw" },
   { span: "col-span-6 lg:col-span-5", aspect: 5 / 4, sizes: "(min-width: 1024px) 41vw, 50vw" },
-  { span: "col-span-12 lg:col-span-4", aspect: 1, sizes: "(min-width: 1024px) 32vw, 100vw" },
+  { span: "col-span-6 lg:col-span-4", aspect: 1, sizes: "(min-width: 1024px) 32vw, 50vw" },
+  { span: "col-span-6 lg:col-span-12", aspect: 12 / 4, sizes: "(min-width: 1024px) 96vw, 50vw" },
 ];
 
 export function CategoryGrid({ categories }: { categories: Category[] }) {

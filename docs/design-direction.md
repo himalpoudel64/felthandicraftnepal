@@ -4,7 +4,7 @@ Bishnu Laxmi Felt Handicraft is an independent artisan label. The site should re
 
 ## Status of the brief
 
-`brief.md` was not available when this site was built. Section order and copy come from the build prompt. The seven category names (Purse, Bags, Hats, Ornaments, Key Rings and Key Chains, Hotpot, Tea Coaster) were supplied by the client. Everything that would need real knowledge of the business is labelled "Sample text" in the seed data. The few fixed lines in `lib/copy.ts` restate only what the build prompt says about the business and should be checked against the real brief.
+`brief.md` was not available when this site was built. Section order and copy come from the build prompt. Seven category names (Purse, Bags, Hats, Ornaments, Key Rings and Key Chains, Hotpot, Tea Coaster) were supplied by the client, and Animals and Figures was added for the free-standing pieces in the client's photographs. Product names and descriptions were written from those photographs. Everything that would need real knowledge of the business is labelled "Sample text" in the seed data. The few fixed lines in `lib/copy.ts` restate only what the build prompt says about the business and should be checked against the real brief.
 
 ## Colour tokens
 
@@ -49,7 +49,7 @@ Headings are set tight (line-height about 1, slight negative tracking). No all-c
 
 - **Hero:** full-bleed image with a burgundy plate overlapping its lower edge.
 - **About teaser:** statement across seven columns, image offset and overlapping the next section.
-- **Collection:** mosaic of seven tiles with spans 7/5, 4/8, 3/5/4.
+- **Collection:** mosaic of eight tiles with spans 7/5, 4/8, 3/5/4, 12.
 - **Featured:** sticky heading on the left, two staggered columns on the right.
 - **Impact:** full-bleed forest band, ruled list with very large words.
 - **Contact:** text left, form right, on bare ivory.

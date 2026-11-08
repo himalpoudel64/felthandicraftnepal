@@ -1,0 +1,82 @@
+{
+  "hero-sheep-stall": {
+    "width": 1600,
+    "height": 900
+  },
+  "hero-santas-and-trees": {
+    "width": 1600,
+    "height": 900
+  },
+  "hero-yaks": {
+    "width": 1600,
+    "height": 900
+  },
+  "festive-character-ornaments": {
+    "width": 1600,
+    "height": 900
+  },
+  "himalayan-yak-figure": {
+    "width": 1200,
+    "height": 620
+  },
+  "polka-dot-chicken-ornament": {
+    "width": 1320,
+    "height": 850
+  },
+  "santa-claus-figure": {
+    "width": 790,
+    "height": 430
+  },
+  "christmas-tree-figure": {
+    "width": 680,
+    "height": 510
+  },
+  "felt-ball-hotpot-mat-square": {
+    "width": 640,
+    "height": 660
+  },
+  "natural-felt-ball-tea-coaster": {
+    "width": 600,
+    "height": 600
+  },
+  "felt-ball-hotpot-mat-round": {
+    "width": 720,
+    "height": 800
+  },
+  "dog-in-red-hoodie": {
+    "width": 830,
+    "height": 1040
+  },
+  "brown-bear-with-cupcake": {
+    "width": 640,
+    "height": 800
+  },
+  "little-white-bear": {
+    "width": 640,
+    "height": 800
+  },
+  "little-yeti-ornament": {
+    "width": 660,
+    "height": 825
+  },
+  "little-green-dinosaur": {
+    "width": 1085,
+    "height": 415
+  },
+  "curly-wool-sheep": {
+    "width": 900,
+    "height": 720
+  },
+  "saddled-yak-key-ring": {
+    "width": 900,
+    "height": 920
+  },
+  "woodland-fox-ornament": {
+    "width": 900,
+    "height": 760
+  },
+  "saddled-horse-ornament": {
+    "width": 900,
+    "height": 810
+  }
+}

@@ -94,7 +94,7 @@ export type About = {
 
 export type Content = {
   settings: Settings;
-  home: Omit<RawHome, "featuredProducts"> & { featured: Product[] };
+  home: Omit<RawHome, "featuredProducts"> & { featured: Product[]; more: Product[] };
   about: About;
   categories: Category[];
   products: Product[];
