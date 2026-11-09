@@ -1,0 +1,125 @@
+---
+import { categoryPath } from "../lib/paths";
+import type { Content } from "../lib/types";
+import SanityImage from "./SanityImage.astro";
+
+interface Props {
+  content: Content;
+}
+const { settings, categories } = Astro.props.content;
+const links = [
+  { label: "Home", href: "/" },
+  { label: "About Us", href: "/about/" },
+];
+const here = Astro.url.pathname;
+const inProducts = here.startsWith("/products/");
+const nameParts = settings.businessName.split(" ");
+const firstLine = nameParts.slice(0, 2).join(" ");
+const secondLine = nameParts.slice(2).join(" ");
+const linkClass = "py-2 underline-offset-[6px] decoration-1 hover:underline aria-[current=page]:underline";
+---
+
+<header class="site-header">
+  <div class="wrap flex h-full items-center justify-between gap-6">
+    <a href="/" class="flex items-center gap-3 leading-none" aria-label={`${settings.businessName}, home`}>
+      {
+        settings.logo?.asset ? (
+          <span class="block h-12 w-12 bg-ivory p-1">
+            <SanityImage image={settings.logo} sizes="48px" aspect={1} widths={[96]} eager />
+          </span>
+        ) : (
+          <span class="font-serif">
+            <span class="block text-[1.4375rem]">{firstLine}</span>
+            <span class="mt-0.5 block font-sans text-[0.8125rem] tracking-[0.02em]">{secondLine}</span>
+          </span>
+        )
+      }
+    </a>
+
+    <nav aria-label="Main" class="hidden items-center gap-8 lg:flex">
+      {links.map((link) => <a href={link.href} class={linkClass} aria-current={here === link.href ? "page" : undefined}>{link.label}</a>)}
+
+      <div class="nav-drop relative flex items-center" data-nav-drop>
+        <a href="/products/" class={linkClass} aria-current={inProducts ? "page" : undefined}>Products</a>
+        <button
+          type="button"
+          class="-mr-2 flex h-11 w-8 items-center justify-center"
+          aria-expanded="false"
+          aria-controls="nav-categories"
+          aria-label="Show product categories"
+        >
+          <svg aria-hidden="true" viewBox="0 0 10 6" class="h-1.5 w-2.5 fill-none stroke-current stroke-[1.5]"><path d="m1 1 4 4 4-4"></path></svg>
+        </button>
+        <div id="nav-categories" class="nav-panel patch patch-ivory absolute left-[-1.25rem] top-full w-64 border border-rule">
+          <ul class="p-4">
+            {
+              categories.map((category) => (
+                <li>
+                  <a href={categoryPath(category)} class="block px-2 py-1.5 text-ink hover:text-terracotta-ink">{category.title}</a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+
+      <a href="/contact/" class={linkClass} aria-current={here === "/contact/" ? "page" : undefined}>Contact</a>
+      <a href="/contact/" class="btn btn-primary !min-h-11 !px-5">Enquire Now</a>
+    </nav>
+
+    <button type="button" class="flex h-11 items-center gap-2 lg:hidden" data-menu-open aria-haspopup="dialog">
+      <span>Menu</span>
+      <svg aria-hidden="true" viewBox="0 0 22 12" class="h-3 w-[1.375rem] fill-none stroke-current stroke-[1.5]"><path d="M0 1h22M0 11h22"></path></svg>
+    </button>
+  </div>
+</header>
+
+<dialog data-menu aria-label="Menu" class="m-0 ml-auto h-dvh max-h-none w-[min(24rem,100vw)] max-w-none overflow-y-auto bg-ivory p-0 text-ink">
+  <div class="flex h-[var(--header-h)] items-center justify-end px-[var(--gutter)]">
+    <button type="button" data-menu-close class="flex h-11 items-center">Close</button>
+  </div>
+  <nav aria-label="Mobile" class="px-[var(--gutter)] pb-10">
+    <ul class="font-serif text-sub">
+      {links.map((link) => <li class="border-t border-rule"><a href={link.href} class="block py-3">{link.label}</a></li>)}
+      <li class="border-t border-rule">
+        <a href="/products/" class="block py-3">Products</a>
+        <ul class="pb-3 font-sans text-base">
+          {categories.map((category) => <li><a href={categoryPath(category)} class="block py-2 pl-4">{category.title}</a></li>)}
+        </ul>
+      </li>
+      <li class="border-y border-rule"><a href="/contact/" class="block py-3">Contact</a></li>
+    </ul>
+    <a href="/contact/" class="btn btn-primary mt-6 w-full">Enquire Now</a>
+  </nav>
+</dialog>
+
+<script>
+  const menu = document.querySelector<HTMLDialogElement>("[data-menu]");
+  document.querySelector("[data-menu-open]")?.addEventListener("click", () => menu?.showModal());
+  document.querySelector("[data-menu-close]")?.addEventListener("click", () => menu?.close());
+  menu?.addEventListener("click", (event) => {
+    if (event.target === menu) menu.close();
+  });
+
+  const drop = document.querySelector<HTMLElement>("[data-nav-drop]");
+  const toggle = drop?.querySelector<HTMLButtonElement>("button");
+  const setOpen = (open: boolean) => {
+    if (!drop || !toggle) return;
+    toggle.setAttribute("aria-expanded", String(open));
+    toggle.setAttribute("aria-label", open ? "Hide product categories" : "Show product categories");
+    drop.toggleAttribute("data-open", open);
+    // Lets Escape close the panel even while the pointer or focus is inside it.
+    drop.toggleAttribute("data-closed", !open && drop.matches(":hover, :focus-within"));
+  };
+  toggle?.addEventListener("click", () => setOpen(toggle.getAttribute("aria-expanded") !== "true"));
+  drop?.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      setOpen(false);
+      toggle?.focus();
+    }
+  });
+  drop?.addEventListener("pointerleave", () => drop.removeAttribute("data-closed"));
+  document.addEventListener("click", (event) => {
+    if (drop && !drop.contains(event.target as Node)) setOpen(false);
+  });
+</script>

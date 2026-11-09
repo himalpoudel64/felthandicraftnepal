@@ -78,5 +78,25 @@
   "saddled-horse-ornament": {
     "width": 900,
     "height": 810
+  },
+  "stock-weaver-at-loom": {
+    "width": 3840,
+    "height": 2560
+  },
+  "stock-weaver-leaning": {
+    "width": 3840,
+    "height": 2560
+  },
+  "stock-weaver-through-loom": {
+    "width": 3840,
+    "height": 2560
+  },
+  "stock-weaver-smiling": {
+    "width": 3840,
+    "height": 2560
+  },
+  "stock-weaver-close": {
+    "width": 3840,
+    "height": 2560
   }
 }

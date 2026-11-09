@@ -1,0 +1,82 @@
+---
+import { plural } from "../lib/format";
+import type { Product } from "../lib/types";
+import ProductCard from "./ProductCard.astro";
+
+interface Props {
+  products: Product[];
+}
+const { products } = Astro.props;
+const tags = [...new Set(products.flatMap((p) => p.tags ?? []))].sort();
+const searchText = (p: Product) =>
+  [p.name, p.category.title, p.shortDescription, ...(p.tags ?? [])].join(" ").toLowerCase();
+---
+
+<div data-catalog>
+  <noscript><style>[data-catalog-tools] { display: none; }</style></noscript>
+
+  <div data-catalog-tools class="flex flex-wrap items-end gap-x-6 gap-y-4 border-y border-rule py-5">
+    <div class="w-full sm:w-80">
+      <label for="catalog-search" class="mb-1 block text-sm font-medium">Search products</label>
+      <input id="catalog-search" type="search" class="field" autocomplete="off" />
+    </div>
+    {
+      tags.length > 1 && (
+        <div role="group" aria-label="Filter by tag" class="flex flex-wrap gap-2">
+          {tags.map((tag) => <button type="button" class="chip" data-tag={tag} aria-pressed="false">{tag}</button>)}
+        </div>
+      )
+    }
+  </div>
+
+  <p data-count role="status" class="mt-5 text-sm text-ink-soft">{plural(products.length, "product")}</p>
+
+  <ul class="mt-5 grid grid-cols-2 gap-x-3 gap-y-10 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-6 lg:gap-y-14">
+    {
+      products.map((product, i) => (
+        <li data-item data-search={searchText(product)} data-tags={(product.tags ?? []).join("|")}>
+          <ProductCard product={product} sizes="(min-width: 1024px) 23vw, (min-width: 768px) 32vw, 50vw" tone={i} headingLevel="h2" />
+        </li>
+      ))
+    }
+  </ul>
+
+  <p data-empty hidden class="py-16 text-center text-lead">
+    Nothing matches that search. <a href="/contact/" class="link-rule">Ask us about it</a> and we will tell you what we can make.
+  </p>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-catalog]");
+  if (root) {
+    const items = [...root.querySelectorAll<HTMLElement>("[data-item]")];
+    const input = root.querySelector<HTMLInputElement>("#catalog-search");
+    const count = root.querySelector<HTMLElement>("[data-count]");
+    const empty = root.querySelector<HTMLElement>("[data-empty]");
+    const chips = [...root.querySelectorAll<HTMLButtonElement>("[data-tag]")];
+    let activeTag = "";
+
+    const apply = () => {
+      const words = (input?.value ?? "").toLowerCase().trim().split(/\s+/).filter(Boolean);
+      let shown = 0;
+      for (const item of items) {
+        const text = item.dataset.search ?? "";
+        const tags = (item.dataset.tags ?? "").split("|");
+        const match = words.every((word) => text.includes(word)) && (!activeTag || tags.includes(activeTag));
+        item.hidden = !match;
+        if (match) shown += 1;
+      }
+      if (count) count.textContent = `${shown} product${shown === 1 ? "" : "s"}`;
+      if (empty) empty.hidden = shown > 0;
+    };
+
+    input?.addEventListener("input", apply);
+    chips.forEach((chip) =>
+      chip.addEventListener("click", () => {
+        activeTag = activeTag === chip.dataset.tag ? "" : (chip.dataset.tag ?? "");
+        chips.forEach((other) => other.setAttribute("aria-pressed", String(other.dataset.tag === activeTag)));
+        apply();
+      }),
+    );
+  }
+</script>

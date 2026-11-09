@@ -1,0 +1,52 @@
+---
+import { categoryPath } from "../lib/paths";
+import type { Content } from "../lib/types";
+import { GENERAL_MESSAGE, whatsappUrl } from "../lib/whatsapp";
+
+interface Props {
+  content: Content;
+}
+const { settings, categories } = Astro.props.content;
+const year = new Date().getFullYear();
+const whatsappDisplay = settings.phone || `+${settings.whatsappNumber}`;
+const heading = "mb-3 text-sm font-medium text-mustard";
+---
+
+<footer class="bg-ink pb-24 text-ivory lg:pb-10">
+  <div class="felt-strip"></div>
+  <div class="wrap grid-12 gap-y-10 pt-14 lg:pt-20">
+    <div class="col-span-12 lg:col-span-5">
+      <p class="font-serif text-section">{settings.businessName}</p>
+      {settings.footerDescription && <p class="mt-5 max-w-md">{settings.footerDescription}</p>}
+    </div>
+
+    <nav aria-label="Footer" class="col-span-6 lg:col-span-2 lg:col-start-6">
+      <h2 class={`${heading} !font-sans tracking-normal`}>Explore</h2>
+      <ul class="space-y-1">
+        <li><a class="link-rule" href="/">Home</a></li>
+        <li><a class="link-rule" href="/about/">About Us</a></li>
+        <li><a class="link-rule" href="/products/">Products</a></li>
+        <li><a class="link-rule" href="/contact/">Contact</a></li>
+      </ul>
+    </nav>
+
+    <nav aria-label="Product categories" class="col-span-6 lg:col-span-2">
+      <h2 class={`${heading} !font-sans tracking-normal`}>Categories</h2>
+      <ul class="space-y-1">
+        {categories.map((category) => <li><a class="link-rule" href={categoryPath(category)}>{category.title}</a></li>)}
+      </ul>
+    </nav>
+
+    <div class="col-span-12 lg:col-span-3">
+      <h2 class={`${heading} !font-sans tracking-normal`}>Contact</h2>
+      <ul class="space-y-1">
+        <li><a class="link-rule" href={whatsappUrl(settings.whatsappNumber, GENERAL_MESSAGE)} target="_blank" rel="noopener">WhatsApp {whatsappDisplay}</a></li>
+        <li><a class="link-rule break-words" href={`mailto:${settings.email}`}>{settings.email}</a></li>
+        {settings.socialLinks?.map((link) => <li><a class="link-rule" href={link.url} rel="noopener me">{link.label}</a></li>)}
+      </ul>
+    </div>
+  </div>
+  <div class="wrap mt-12 lg:mt-16">
+    <p class="border-t border-ivory/25 pt-5 text-sm">&copy; {year} {settings.businessName}. All rights reserved.</p>
+  </div>
+</footer>

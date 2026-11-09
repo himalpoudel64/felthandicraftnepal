@@ -1,0 +1,23 @@
+---
+import { categoryPath } from "../lib/paths";
+import type { Category } from "../lib/types";
+
+interface Props {
+  categories: Category[];
+  current?: string;
+}
+const { categories, current } = Astro.props;
+---
+
+<nav aria-label="Categories">
+  <ul class="-mx-[var(--gutter)] flex gap-2 overflow-x-auto px-[var(--gutter)] pb-1 lg:mx-0 lg:flex-wrap lg:px-0">
+    <li class="shrink-0"><a href="/products/" class="chip" aria-current={current ? undefined : "page"}>All</a></li>
+    {
+      categories.map((category) => (
+        <li class="shrink-0">
+          <a href={categoryPath(category)} class="chip" aria-current={current === category._id ? "page" : undefined}>{category.title}</a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>

@@ -1,161 +1,82 @@
 # Bishnu Laxmi Felt Handicraft
 
-Static website for felthandicraftnepal.com. Next.js static export on Cloudflare Pages, with content in Sanity. It runs on free tiers only.
+Static website for felthandicraftnepal.com, built with Astro and Tailwind CSS, with content in Sanity, hosted on Cloudflare Pages.
 
-Non-technical editing instructions are in [docs/client-guide.md](docs/client-guide.md). Design decisions are in [docs/design-direction.md](docs/design-direction.md).
+- Full setup and deployment: [docs/SETUP_GUIDE.md](docs/SETUP_GUIDE.md)
+- For the business owner: [docs/CLIENT_GUIDE.md](docs/CLIENT_GUIDE.md)
+- Design decisions: [docs/design-direction.md](docs/design-direction.md)
 
-## How it fits together
+## Quick start
 
-1. An editor publishes in Sanity Studio.
-2. A Sanity webhook calls a Cloudflare deploy hook.
-3. Cloudflare runs `npm run build`, which fetches all content once and writes static HTML to `out/`.
-
-There is no server at runtime. Enquiries go from the browser to Web3Forms, which emails `info@`.
-
-## Local setup
-
-Requires Node 20.9 or newer.
+Requires Node 22.23.4 or newer. Node 24 LTS is recommended.
 
 ```bash
 npm install
 ```
 
 ```bash
-cp .env.example .env.local
-```
-
-```bash
 npm run dev
 ```
 
-With no Sanity project ID, the site builds from `studio/seed/seed.ndjson`, so it renders straight away. The build warns when it does this.
+With no Sanity project ID in `.env`, the site builds from `studio/seed/seed.ndjson`, so it renders straight away.
 
-| Variable | Where | Purpose |
-| --- | --- | --- |
-| `NEXT_PUBLIC_SANITY_PROJECT_ID` | Site | Sanity project. Blank means use the seed file. |
-| `NEXT_PUBLIC_SANITY_DATASET` | Site | Usually `production`. |
-| `SITE_URL` | Site | Canonical origin, https, no trailing slash. Change it to the `www` form only if the client prefers that. |
-| `WEB3FORMS_KEY` | Site | Web3Forms access key. It is designed to be public and appears in the page HTML. If blank, forms offer an email link instead. |
-| `SANITY_SEED_FILE` | Site, optional | Builds from a different `.ndjson` file, for previews. |
-| `SANITY_STUDIO_PROJECT_ID` | `studio/.env` | Same project ID as above. |
-| `SANITY_STUDIO_DATASET` | `studio/.env` | Usually `production`. |
-
-Other commands: `npm run build`, `npm run lint`, `npm run typecheck`.
-
-The build prints every missing image and missing alt text. It fails on purpose if Sanity cannot be reached, or if there are no published categories or products, so a broken build never replaces a working site.
-
-## Sanity
-
-1. Create a free project at sanity.io/manage. Use a public dataset named `production`.
-2. Install and configure the Studio. It has its own `package.json`.
-
-```bash
-cd studio && npm install && cp .env.example .env
-```
-
-3. Put the project ID in `studio/.env`, then log in and load the sample content.
-
-```bash
-npx sanity login
-```
-
-```bash
-npm run seed
-```
-
-4. Deploy the Studio. Sanity asks you to choose a `*.sanity.studio` address.
-
-```bash
-npm run deploy
-```
-
-5. Invite the client under Members in sanity.io/manage.
-
-## Web3Forms
-
-Enter `info@felthandicraftnepal.com` at web3forms.com, and put the emailed access key in `WEB3FORMS_KEY`.
-
-## Cloudflare Pages
-
-Create a Pages project connected to the Git repository.
-
-| Setting | Value |
+| Command | What it does |
 | --- | --- |
-| Framework preset | None |
-| Build command | `npm run build` |
-| Output directory | `out` |
-| Root directory | leave empty |
-| Environment variables | The site variables above, plus `NODE_VERSION` = `22` |
+| `npm run dev` | Development server on port 4321 |
+| `npm run build` | Production build in `dist/` |
+| `npm run preview` | Serves the production build |
+| `npm run check` | Type checks the project |
 
-`public/_headers` sets long caching for hashed assets and the security headers. Its Content-Security-Policy allows `cdn.sanity.io` for images and `api.web3forms.com` for forms. Update it if either service changes. `public/_redirects` is ready for future URL changes.
+## Environment variables
 
-### Rebuild on publish
+| Variable | Purpose |
+| --- | --- |
+| `PUBLIC_SANITY_PROJECT_ID` | Sanity project. Blank uses the seed file. |
+| `PUBLIC_SANITY_DATASET` | Usually `production`. |
+| `SITE_URL` | Canonical origin, https, no trailing slash. |
+| `PUBLIC_WEB3FORMS_KEY` | Web3Forms access key for felthandicraftnepal@gmail.com. Public by design. |
+| `NODE_VERSION` | Cloudflare only. Set to `24`. |
+| `SANITY_STUDIO_PROJECT_ID` | In `studio/.env`. |
+| `SANITY_STUDIO_DATASET` | In `studio/.env`. |
+| `SANITY_STUDIO_SITE_URL` | In `studio/.env`. Used by the "View on website" button. |
 
-1. In Cloudflare, go to the Pages project, then Settings, Builds, Deploy hooks. Create one for the production branch and copy the URL.
-2. In sanity.io/manage, go to API, Webhooks, and create a webhook:
-   - URL: the deploy hook
-   - Dataset: `production`
-   - Trigger on: Create, Update, Delete
-   - Filter: `_type in ["category", "product", "siteSettings", "homePage", "aboutPage"]`
-   - HTTP method: POST
-   - Leave "Trigger webhook when drafts are modified" off
+## Structure
 
-## Domain, email, Search Console
+```text
+src/pages         Routes: home, about, products, categories, products, contact, 404, sitemap, robots
+src/components    Astro components. Interactive parts are small inline scripts
+src/layouts       BaseLayout: head, metadata, structured data, header, footer
+src/lib           Sanity fetch and normalise, images, SEO, WhatsApp, formatting
+src/styles        Design tokens and component classes
+src/assets/fonts  Self-hosted fonts
+studio            Sanity Studio, deployed separately
+studio/seed       Starting content and photographs for import
+public/seed       Image variants, used only when building from the seed file
+```
 
-1. Add `felthandicraftnepal.com` as a custom domain on the Pages project.
-2. Add `www` too, and redirect it to the apex with a Cloudflare redirect rule, so there is one canonical form.
-3. In Cloudflare, turn on Email Routing and forward `info@felthandicraftnepal.com` to the client's inbox.
-4. In Google Search Console, add the URL-prefix property `https://felthandicraftnepal.com/` and choose the HTML tag method. Paste only the token value into Site Settings in the Studio, and publish.
-5. After the rebuild, verify the property and submit `https://felthandicraftnepal.com/sitemap.xml`.
-
-## Product photographs in the seed
-
-The seed lists 17 real products. Their photographs are in two places:
-
-- `studio/seed/images/`: the full-size crops. `npm run seed` uploads these to Sanity.
-- `public/seed/` and `studio/seed/images.json`: pre-built WebP variants, used only when the site builds from the seed file.
-
-Once the site reads from Sanity, `public/seed/` is no longer used and can be deleted.
-
-## Before launch
-
-- Set real prices. Every photographed product has the placeholder size "One size (sample price)" at NPR 450, and the build lists them all until they change.
-- Replace everything marked "Sample" in the Studio. Purse, Bags and Hats have no photographs yet.
-- Review the fixed wording in `lib/copy.ts` and the descriptions in `generateMetadata` in `app/page.tsx`, `app/products/page.tsx`, `app/about/page.tsx` and `app/contact/page.tsx`.
-- Add the WhatsApp number in Site Settings. The WhatsApp buttons stay hidden until it is set.
-- Upload real photographs, then re-run Lighthouse. See the note below.
-- Paste a live product URL and the home page into Google's Rich Results Test.
+All content comes from one GROQ query in `src/lib/queries.ts`, run once per build. The build stops if Sanity cannot be reached or nothing is published, so a broken build never replaces a working site, and it prints any missing images, alt text, sample prices and temporary stock photos.
 
 ## Performance
 
-Measured with Lighthouse 12.8 (mobile, default simulated throttling) on a local server with gzip, using the seed content and the real photographs.
+Lighthouse 12.8, mobile, default simulated throttling, on a local server with gzip, using the seed content. Three runs on a development laptop.
 
-| Page | Performance | Accessibility | Best Practices | SEO | LCP | CLS |
-| --- | --- | --- | --- | --- | --- | --- |
-| Home | 76 to 90 | 100 | 100 | 100 | 3.5 to 3.7 s | 0 |
-| Category | 92 to 96 | 100 | 100 | 100 | 2.7 to 2.9 s | 0 |
-| Product | 89 to 95 | 100 | 100 | 100 | 2.8 to 3.0 s | 0 |
+| Page | Performance | Accessibility | Best Practices | SEO |
+| --- | --- | --- | --- | --- |
+| Home | 97 to 99 | 100 | 100 | 100 |
+| Category | 90 to 99 | 100 | 100 | 100 |
+| Product | 97 to 100 | 100 | 100 | 100 |
 
-Ranges are from three runs on a development laptop, where scores moved with machine load. The home page is below the 95 target. Its LCP is the hero photograph, and with the collection tiles just below it, many images load early. Measure again on the live Cloudflare URL with PageSpeed Insights, because that is the number that counts, and because Sanity's CDN serves different files from the local ones.
-
-First-load JavaScript is about 136 to 139 KB gzipped, and most of that is the Next.js and React runtime. Sanity's client is build-time only and does not reach the browser.
+Cumulative layout shift was 0 throughout. Re-measure on the live URL with PageSpeed Insights once images are served from Sanity's CDN.
 
 ## Dependencies
 
 | Package | Why |
 | --- | --- |
-| `next`, `react`, `react-dom` | The required framework. |
-| `@sanity/client` | Fetches content at build time. Not shipped to browsers. |
-| `tailwindcss`, `@tailwindcss/postcss` | The required CSS system and its build step. |
-| `typescript`, `@types/node`, `@types/react`, `@types/react-dom` | Strict type checking. |
-| `eslint`, `eslint-config-next` | The lint step. |
+| `astro` | The framework |
+| `tailwindcss`, `@tailwindcss/vite` | Styling |
+| `@sanity/client` | Fetches content at build time. Not sent to browsers. |
+| `typescript`, `@astrojs/check`, `@types/node` | Type checking |
 
-Studio only (`studio/package.json`):
+Studio only: `sanity`, `react`, `react-dom`, `styled-components`, `typescript`.
 
-| Package | Why |
-| --- | --- |
-| `sanity` | The Studio itself. |
-| `react`, `react-dom`, `styled-components` | Required peer dependencies of the Studio. |
-| `typescript` | Type checks the schemas. |
-
-Deliberately not used: `next/image` (needs a server), `@portabletext/react` (a 30-line renderer covers the styles the Studio allows), `@sanity/image-url` (`lib/image-loader.ts` is small and also computes aspect-ratio crops).
+No UI framework reaches the browser. `sitemap.xml` and `robots.txt` are small Astro routes, so no sitemap package is needed.

@@ -1,0 +1,153 @@
+---
+import CategoryGrid from "../components/CategoryGrid.astro";
+import HeroCarousel from "../components/HeroCarousel.astro";
+import ProductCard from "../components/ProductCard.astro";
+import SanityImage from "../components/SanityImage.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { imageProps } from "../lib/images";
+import { getContent } from "../lib/sanity";
+import { GENERAL_MESSAGE, whatsappUrl } from "../lib/whatsapp";
+import WhatsAppIcon from "../components/WhatsAppIcon.astro";
+
+const { settings, home, categories } = await getContent();
+const slides = home.heroSlides ?? [];
+const lcp = imageProps(slides[0], { sizes: "100vw", widths: [640, 828, 1080, 1440, 1920, 2400] });
+const sentences = home.heroHeadline.match(/[^.!?]+[.!?]*/g)?.map((s) => s.trim()) ?? [home.heroHeadline];
+---
+
+<BaseLayout
+  title={settings.seoTitle || `Handmade Felt Products from Nepal | ${settings.businessName}`}
+  description={settings.seoDescription || home.heroText}
+  path="/"
+  image={slides[0]}
+  preloadImage={lcp}
+>
+  <section data-hero class="relative -mt-[var(--header-h)]">
+    <HeroCarousel slides={slides} lcp={lcp} />
+    <div class="wrap relative z-10 -mt-10 lg:-mt-28">
+      <div class="patch grid gap-x-12 p-7 sm:p-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-end lg:p-12" style="--stitch-inset:.75rem">
+        <h1 class="text-display">
+          {sentences.map((line, i) => <span class:list={["block", i > 0 && "italic"]}>{line}</span>)}
+        </h1>
+        <div>
+          <p class="mt-5 text-lg leading-snug lg:mt-0">{home.heroText}</p>
+          <div class="relative z-10 mt-5 flex flex-wrap gap-3">
+            <a href="/products/" class="btn btn-mustard">{home.heroPrimaryLabel}</a>
+            <a href="/about/" class="btn btn-on-dark">{home.heroSecondaryLabel}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap grid-12 items-center gap-y-12 pb-10 pt-20 lg:pb-16 lg:pt-32">
+    <div class="col-span-12 lg:col-span-6" data-reveal>
+      <h2 class="text-title">{home.storyTitle}</h2>
+      <p class="mt-6 max-w-xl text-lead">{home.storyText}</p>
+      <a href="/about/" class="link-rule mt-6 inline-block font-medium">{home.storyLinkLabel}</a>
+    </div>
+    <div class="relative col-span-11 col-start-2 lg:col-span-5 lg:col-start-8" data-reveal>
+      <SanityImage image={home.storyImage} sizes="(min-width: 1024px) 40vw, 90vw" aspect={4 / 5} />
+      {home.storyImage?.credit && <p class="mt-1 text-xs text-ink-soft">{home.storyImage.credit}</p>}
+      <div class="absolute -left-[12%] bottom-12 w-[42%] border-[6px] border-ivory lg:-left-[28%]">
+        <SanityImage image={home.storyDetailImage} sizes="(min-width: 1024px) 16vw, 36vw" aspect={1} />
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap pt-16 lg:pt-24">
+    <div class="mb-8 flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2 lg:mb-12">
+      <h2 class="text-section">{home.categoriesTitle}</h2>
+      <a href="/products/" class="link-rule font-medium">See every product</a>
+    </div>
+    <CategoryGrid categories={categories} />
+  </section>
+
+  {
+    home.featured.length > 0 && (
+      <section class="wrap grid-12 py-20 lg:py-32">
+        <div class="col-span-12 mb-10 lg:sticky lg:top-28 lg:col-span-4 lg:mb-0 lg:self-start">
+          <h2 class="text-section">{home.featuredTitle}</h2>
+          <div class="felt-strip mt-6 w-[144px]" />
+        </div>
+        <ul class="col-span-12 grid grid-cols-2 gap-x-3 gap-y-10 lg:col-span-7 lg:col-start-6 lg:gap-x-6">
+          {home.featured.map((product, i) => (
+            <li class="lg:even:mt-24" data-reveal>
+              <ProductCard product={product} sizes="(min-width: 1024px) 28vw, 50vw" tone={i + 3} />
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  {
+    home.more.length > 0 && (
+      <section class="wrap pb-20 lg:pb-32">
+        <h2 class="mb-8 border-t border-rule pt-8 text-sub">More from the workshop</h2>
+        <ul class="grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 lg:grid-cols-6 lg:gap-x-6">
+          {home.more.map((product) => (
+            <li data-reveal>
+              <ProductCard product={product} sizes="(min-width: 1024px) 15vw, (min-width: 640px) 32vw, 50vw" aspect={1} showSummary={false} />
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <section class="bg-forest text-ivory">
+    <div class="grid lg:grid-cols-2">
+      <div>
+        <SanityImage image={home.impactImage} sizes="(min-width: 1024px) 50vw, 100vw" aspect={1} class="lg:h-full" />
+        {home.impactImage?.credit && <p class="px-[var(--gutter)] py-2 text-xs lg:px-4">{home.impactImage.credit}</p>}
+      </div>
+      <div class="px-[var(--gutter)] py-16 lg:px-16 lg:py-24">
+        <h2 class="text-section">{home.impactTitle}</h2>
+        {home.impactText && <p class="mt-5 max-w-lg">{home.impactText}</p>}
+        <ul class="mt-10">
+          {
+            home.impactItems?.map((item) => (
+              <li class="border-t border-ivory/30 py-6" data-reveal>
+                <h3 class="text-sub">{item.title}</h3>
+                <p class="mt-2 max-w-lg">{item.text}</p>
+              </li>
+            ))
+          }
+        </ul>
+        {
+          (home.impactStats?.length ?? 0) > 0 && (
+            <dl class="mt-8 flex flex-wrap gap-x-12 gap-y-6 border-t border-ivory/30 pt-8">
+              {home.impactStats?.map((stat) => (
+                <div>
+                  <dd class="font-serif text-section">{stat.value}</dd>
+                  <dt class="mt-1 text-sm">{stat.label}</dt>
+                </div>
+              ))}
+            </dl>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-burgundy text-ivory">
+    <div class="wrap grid-12 gap-y-10 py-20 lg:py-28">
+      <div class="col-span-12 lg:col-span-7">
+        <h2 class="text-title">{home.contactTitle}</h2>
+        <p class="mt-5 max-w-lg text-lead">{home.contactText}</p>
+      </div>
+      <ul class="col-span-12 lg:col-span-4 lg:col-start-9 lg:self-end">
+        <li class="border-t border-ivory/40">
+          <a href={whatsappUrl(settings.whatsappNumber, GENERAL_MESSAGE)} target="_blank" rel="noopener" class="flex items-center gap-3 py-4 hover:text-mustard">
+            <WhatsAppIcon class="h-5 w-5" /> WhatsApp us
+          </a>
+        </li>
+        <li class="border-t border-ivory/40">
+          <a href={`mailto:${settings.email}`} class="block break-words py-4 hover:text-mustard">{settings.email}</a>
+        </li>
+        <li class="border-y border-ivory/40"><a href="/contact/" class="block py-4 hover:text-mustard">Go to the contact page</a></li>
+      </ul>
+    </div>
+  </section>
+</BaseLayout>

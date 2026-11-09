@@ -1,0 +1,173 @@
+---
+import { imageProps, type ImgProps } from "../lib/images";
+import type { ImageData } from "../lib/types";
+
+interface Props {
+  slides: ImageData[];
+  lcp: ImgProps | null;
+}
+
+const WIDTHS = [640, 828, 1080, 1440, 1920, 2400];
+const { slides, lcp } = Astro.props;
+const count = slides.length;
+const note = (slide: ImageData | undefined) => slide?.credit || slide?.caption || "";
+const buttonClass = "flex h-11 w-11 items-center justify-center hover:bg-burgundy";
+---
+
+<div
+  data-carousel
+  role="region"
+  aria-roledescription="carousel"
+  aria-label="Photographs of our work"
+  class="relative h-[54svh] overflow-hidden bg-forest lg:h-[min(80svh,56rem)]"
+>
+  <div data-track class="absolute inset-0">
+    {
+      slides.map((slide, i) => {
+        const img = i === 0 && lcp ? lcp : imageProps(slide, { sizes: "100vw", widths: WIDTHS });
+        const position = slide.hotspot ? `object-position:${slide.hotspot.x * 100}% ${slide.hotspot.y * 100}%` : undefined;
+        return (
+          <div
+            data-slide
+            data-note={note(slide)}
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`${i + 1} of ${count}`}
+            aria-hidden={i === 0 ? undefined : "true"}
+            hidden={i !== 0}
+            class:list={["absolute inset-0 transition-opacity duration-700", i === 0 ? "opacity-100" : "opacity-0"]}
+          >
+            {img && (
+              <img
+                src={img.src}
+                srcset={img.srcset}
+                sizes={img.sizes}
+                width={img.width}
+                height={img.height}
+                alt={img.alt}
+                loading={i === 0 ? "eager" : "lazy"}
+                decoding={i === 0 ? "sync" : "async"}
+                fetchpriority={i === 0 ? "high" : undefined}
+                class="h-full w-full object-cover"
+                style={position}
+              />
+            )}
+          </div>
+        );
+      })
+    }
+  </div>
+
+  <div class="absolute bottom-12 right-0 z-10 flex max-w-full flex-col items-end bg-ink text-ivory sm:flex-row sm:items-center lg:bottom-32 lg:right-[var(--gutter)]">
+    <p data-note class="max-w-sm px-4 py-2 text-xs leading-snug empty:hidden">{note(slides[0])}</p>
+    {
+      count > 1 && (
+        <div class="flex shrink-0">
+          <button type="button" class={buttonClass} data-prev aria-label="Previous photograph">
+            <svg aria-hidden="true" viewBox="0 0 8 14" class="h-3.5 w-2 fill-none stroke-current stroke-[1.5]"><path d="M7 1 1 7l6 6" /></svg>
+          </button>
+          <ul class="flex">
+            {slides.map((_, i) => (
+              <li>
+                <button type="button" data-dot class="flex h-11 w-6 items-center justify-center" aria-label={`Show photograph ${i + 1}`} aria-current={i === 0 ? "true" : undefined}>
+                  <span class="block h-2 w-2 rounded-full border border-ivory" />
+                </button>
+              </li>
+            ))}
+          </ul>
+          <button type="button" class={buttonClass} data-next aria-label="Next photograph">
+            <svg aria-hidden="true" viewBox="0 0 8 14" class="h-3.5 w-2 fill-none stroke-current stroke-[1.5]"><path d="m1 1 6 6-6 6" /></svg>
+          </button>
+          <button type="button" class={buttonClass} data-toggle aria-label="Pause automatic slideshow">
+            <svg aria-hidden="true" viewBox="0 0 12 14" class="h-3.5 w-3 fill-current"><path d="M1 0h3.5v14H1zM7.5 0H11v14H7.5z" /></svg>
+          </button>
+        </div>
+      )
+    }
+  </div>
+</div>
+
+<style>
+  [data-dot][aria-current="true"] span {
+    background: var(--color-ivory);
+  }
+</style>
+
+<script>
+  const INTERVAL = 7000;
+  const PAUSE = "M1 0h3.5v14H1zM7.5 0H11v14H7.5z";
+  const PLAY = "M1 0l11 7-11 7z";
+
+  const root = document.querySelector<HTMLElement>("[data-carousel]");
+  const slides = [...(root?.querySelectorAll<HTMLElement>("[data-slide]") ?? [])];
+  const count = slides.length;
+
+  if (root && count > 1) {
+    const dots = [...root.querySelectorAll<HTMLButtonElement>("[data-dot]")];
+    const noteEl = root.querySelector<HTMLElement>("p[data-note]");
+    const toggle = root.querySelector<HTMLButtonElement>("[data-toggle]");
+    const track = root.querySelector<HTMLElement>("[data-track]");
+    const icon = toggle?.querySelector("path");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    let index = 0;
+    let playing = !reduced.matches;
+    let held = false;
+    let timer: number | undefined;
+
+    const wrap = (n: number) => (n + count) % count;
+    // Removing "hidden" lets the lazy image start loading before it is needed.
+    const reveal = (n: number) => slides[wrap(n)]?.removeAttribute("hidden");
+
+    function show(next: number) {
+      const target = wrap(next);
+      reveal(target);
+      reveal(target + 1);
+      slides.forEach((slide, i) => {
+        const active = i === target;
+        slide.classList.toggle("opacity-100", active);
+        slide.classList.toggle("opacity-0", !active);
+        if (active) slide.removeAttribute("aria-hidden");
+        else slide.setAttribute("aria-hidden", "true");
+      });
+      dots.forEach((dot, i) => {
+        if (i === target) dot.setAttribute("aria-current", "true");
+        else dot.removeAttribute("aria-current");
+      });
+      if (noteEl) noteEl.textContent = slides[target]?.dataset.note ?? "";
+      index = target;
+      schedule();
+    }
+
+    function schedule() {
+      window.clearTimeout(timer);
+      if (playing && !held) timer = window.setTimeout(() => show(index + 1), INTERVAL);
+    }
+
+    function setPlaying(next: boolean) {
+      playing = next;
+      track?.setAttribute("aria-live", playing ? "off" : "polite");
+      toggle?.setAttribute("aria-label", playing ? "Pause automatic slideshow" : "Play automatic slideshow");
+      icon?.setAttribute("d", playing ? PAUSE : PLAY);
+      schedule();
+    }
+
+    const hold = (value: boolean) => () => {
+      held = value;
+      schedule();
+    };
+
+    root.querySelector("[data-prev]")?.addEventListener("click", () => show(index - 1));
+    root.querySelector("[data-next]")?.addEventListener("click", () => show(index + 1));
+    dots.forEach((dot, i) => dot.addEventListener("click", () => show(i)));
+    toggle?.addEventListener("click", () => setPlaying(!playing));
+    root.addEventListener("pointerenter", hold(true));
+    root.addEventListener("pointerleave", hold(false));
+    root.addEventListener("focusin", hold(true));
+    root.addEventListener("focusout", hold(false));
+
+    setPlaying(playing);
+    // Loads the second photograph only after the first page view has settled.
+    window.addEventListener("load", () => window.setTimeout(() => reveal(1), 3000), { once: true });
+  }
+</script>

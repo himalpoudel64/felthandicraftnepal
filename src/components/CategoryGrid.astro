@@ -1,0 +1,40 @@
+---
+import { categoryPath } from "../lib/paths";
+import type { Category } from "../lib/types";
+import SanityImage from "./SanityImage.astro";
+
+interface Props {
+  categories: Category[];
+}
+const { categories } = Astro.props;
+
+/** A mosaic: columns add up to 12 on each row and aspects keep row heights equal. */
+const TILES = [
+  { span: "col-span-12 lg:col-span-7", aspect: 7 / 5, sizes: "(min-width: 1024px) 57vw, 100vw" },
+  { span: "col-span-6 lg:col-span-5", aspect: 1, sizes: "(min-width: 1024px) 41vw, 50vw" },
+  { span: "col-span-6 lg:col-span-4", aspect: 4 / 5, sizes: "(min-width: 1024px) 32vw, 50vw" },
+  { span: "col-span-12 lg:col-span-8", aspect: 8 / 5, sizes: "(min-width: 1024px) 66vw, 100vw" },
+  { span: "col-span-6 lg:col-span-3", aspect: 3 / 4, sizes: "(min-width: 1024px) 24vw, 50vw" },
+  { span: "col-span-6 lg:col-span-5", aspect: 5 / 4, sizes: "(min-width: 1024px) 41vw, 50vw" },
+  { span: "col-span-6 lg:col-span-4", aspect: 1, sizes: "(min-width: 1024px) 32vw, 50vw" },
+  { span: "col-span-6 lg:col-span-12", aspect: 12 / 4, sizes: "(min-width: 1024px) 96vw, 50vw" },
+];
+const tile = (i: number) => TILES[i % TILES.length] as (typeof TILES)[number];
+---
+
+<ul class="grid-12 gap-y-4 lg:gap-y-6">
+  {
+    categories.map((category, i) => (
+      <li class={tile(i).span} data-reveal>
+        <a href={categoryPath(category)} class="group relative block">
+          <div class="tile-frame">
+            <SanityImage image={category.image} sizes={tile(i).sizes} aspect={tile(i).aspect} tone={i} label="Photograph coming soon" />
+          </div>
+          <h3 class="patch patch-ivory absolute bottom-0 left-0 px-5 py-3 font-serif text-lg leading-tight transition-colors group-hover:text-terracotta-ink sm:px-6 sm:py-4 sm:text-sub">
+            {category.title}
+          </h3>
+        </a>
+      </li>
+    ))
+  }
+</ul>

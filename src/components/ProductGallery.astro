@@ -1,0 +1,37 @@
+---
+import type { Product } from "../lib/types";
+import SanityImage from "./SanityImage.astro";
+
+interface Props {
+  product: Product;
+  sizes: string;
+}
+const { product, sizes } = Astro.props;
+const images = product.images ?? [];
+const many = images.length > 1;
+---
+
+{
+  images.length ? (
+    <ul
+      class:list={[
+        "-mx-[var(--gutter)] flex snap-x snap-mandatory gap-2 overflow-x-auto lg:mx-0 lg:block lg:snap-none lg:space-y-4 lg:overflow-visible",
+        many && "pr-8 lg:pr-0",
+      ]}
+      tabindex={many ? 0 : undefined}
+      aria-label={many ? `Photographs of ${product.name}` : undefined}
+      role={many ? "group" : undefined}
+    >
+      {images.map((image, i) => (
+        <li class:list={["shrink-0 snap-start", many ? "w-[88%] lg:w-full" : "w-full"]}>
+          <SanityImage image={image} sizes={sizes} eager={i === 0} />
+          {image.credit && <p class="mt-1 px-[var(--gutter)] text-xs text-ink-soft lg:px-0">{image.credit}</p>}
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <div class="-mx-[var(--gutter)] lg:mx-0">
+      <SanityImage image={undefined} sizes={sizes} aspect={4 / 5} tone={1} label="Sample product, photograph coming soon" />
+    </div>
+  )
+}

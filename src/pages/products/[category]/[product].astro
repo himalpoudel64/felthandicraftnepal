@@ -1,0 +1,127 @@
+---
+import type { GetStaticPaths } from "astro";
+import Breadcrumbs from "../../../components/Breadcrumbs.astro";
+import EnquiryDialog from "../../../components/EnquiryDialog.astro";
+import PortableText from "../../../components/PortableText.astro";
+import ProductCard from "../../../components/ProductCard.astro";
+import ProductGallery from "../../../components/ProductGallery.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { formatPrice } from "../../../lib/format";
+import { imageProps } from "../../../lib/images";
+import { categoryPath, productPath } from "../../../lib/paths";
+import { getContent, relatedTo } from "../../../lib/sanity";
+import { breadcrumbLd, productCrumbs, productDescription, productLd, productTitle } from "../../../lib/seo";
+import type { Product } from "../../../lib/types";
+
+export const getStaticPaths = (async () => {
+  const { products } = await getContent();
+  return products.map((product) => ({
+    params: { category: product.category.slug, product: product.slug },
+    props: { product },
+  }));
+}) satisfies GetStaticPaths;
+
+const { product } = Astro.props as { product: Product };
+const { settings, products } = await getContent();
+const crumbs = productCrumbs(product);
+const related = relatedTo(product, products);
+const GALLERY_SIZES = "(min-width: 1024px) 54vw, 100vw";
+const first = product.sizes[0] as Product["sizes"][number];
+const display = (price: number) => `${formatPrice(price)}${product.samplePrice ? " (sample price)" : ""}`;
+const lcp = imageProps(product.images?.[0], { sizes: GALLERY_SIZES });
+---
+
+<BaseLayout
+  title={productTitle(product)}
+  description={productDescription(product)}
+  path={productPath(product)}
+  image={product.images?.[0]}
+  jsonLd={[breadcrumbLd(crumbs), productLd(product, settings)]}
+  preloadImage={lcp}
+>
+  <div class="wrap pb-16 pt-8 lg:pb-24">
+    <Breadcrumbs items={crumbs} />
+    <div class="grid-12 mt-6 gap-y-8">
+      <div class="col-span-12 lg:col-span-7">
+        <ProductGallery product={product} sizes={GALLERY_SIZES} />
+      </div>
+
+      <div class="col-span-12 lg:sticky lg:top-28 lg:col-span-5 lg:col-start-8 lg:self-start lg:pl-8">
+        <a href={categoryPath(product.category)} class="link-rule text-[0.9375rem]">{product.category.title}</a>
+        <h1 class="mt-3 text-section">{product.name}</h1>
+        {product.shortDescription && <p class="mt-4 text-lead">{product.shortDescription}</p>}
+
+        <div class="mt-6 border-t border-rule pt-5">
+          <p class="text-sm text-ink-soft">Price for size <span data-size-output>{first.label}</span></p>
+          <p class="mt-1 font-serif text-sub" data-price-output aria-live="polite" aria-atomic="true">{display(first.price)}</p>
+          {product.samplePrice && <p class="mt-1 text-sm text-ink-soft">This is a sample price. Please ask us for the current price.</p>}
+        </div>
+
+        <fieldset data-sizes class="mt-5">
+          <legend class="mb-2 text-sm font-medium">Available sizes</legend>
+          <div class="flex flex-wrap gap-2">
+            {
+              product.sizes.map((size, i) => (
+                <label class="size-option cursor-pointer">
+                  <input type="radio" name="size" class="sr-only" value={size.label} data-display={display(size.price)} checked={i === 0} />
+                  <span class="block min-h-11 border border-line px-4 py-2 leading-tight transition-colors hover:border-ink">
+                    <span class="block font-medium">{size.label}</span>
+                    <span class="block text-sm">{formatPrice(size.price)}</span>
+                  </span>
+                </label>
+              ))
+            }
+          </div>
+        </fieldset>
+
+        <button type="button" data-open-enquiry class="btn btn-primary mt-6 w-full">Enquire About This Product</button>
+
+        {
+          (product.tags?.length ?? 0) > 0 && (
+            <ul class="mt-6 flex flex-wrap gap-2" aria-label="Tags">
+              {product.tags?.map((tag) => <li class="border border-rule px-3 py-1 text-sm">{tag}</li>)}
+            </ul>
+          )
+        }
+
+        <div class="mt-8 border-t border-rule pt-6">
+          <h2 class="text-sub">About this piece</h2>
+          <PortableText blocks={product.description} class="mt-3" />
+        </div>
+
+        {
+          (product.specifications?.length ?? 0) > 0 && (
+            <div class="mt-8 border-t border-rule pt-6">
+              <h2 class="text-sub">Specifications</h2>
+              <dl class="mt-3">
+                {product.specifications?.map((spec) => (
+                  <div class="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-3 border-b border-rule py-2 text-[0.9375rem]">
+                    <dt class="text-ink-soft">{spec.label}</dt>
+                    <dd>{spec.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          )
+        }
+      </div>
+    </div>
+
+    {
+      related.length > 0 && (
+        <section class="mt-20 border-t border-rule pt-10 lg:mt-28">
+          <h2 class="text-section">You may also like</h2>
+          <ul class="mt-8 grid grid-cols-2 gap-x-3 gap-y-10 lg:grid-cols-4 lg:gap-x-6">
+            {related.map((item, i) => (
+              <li>
+                <ProductCard product={item} sizes="(min-width: 1024px) 23vw, 50vw" tone={i} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </div>
+
+  <EnquiryDialog product={product} settings={settings} />
+</BaseLayout>

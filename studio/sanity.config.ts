@@ -1,6 +1,7 @@
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
-import { schemaTypes, singletonTypes } from "./schemas";
+import { viewOnWebsite } from "./actions/viewOnWebsite";
+import { schemaTypes, singletonTypes } from "./schemaTypes";
 import { structure } from "./structure";
 
 export default defineConfig({
@@ -28,9 +29,11 @@ export default defineConfig({
   },
   document: {
     // Singletons can be edited and published, but never duplicated or deleted.
-    actions: (previous, { schemaType }) =>
-      singletonTypes.has(schemaType)
+    actions: (previous, { schemaType }) => [
+      ...(singletonTypes.has(schemaType)
         ? previous.filter(({ action }) => action === "publish" || action === "discardChanges" || action === "restore")
-        : previous,
+        : previous),
+      viewOnWebsite,
+    ],
   },
 });

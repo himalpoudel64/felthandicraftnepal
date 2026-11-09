@@ -1,0 +1,30 @@
+---
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import CategoryNav from "../../components/CategoryNav.astro";
+import ProductGrid from "../../components/ProductGrid.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getContent } from "../../lib/sanity";
+import { breadcrumbLd, collectionLd } from "../../lib/seo";
+
+const { settings, categories, products } = await getContent();
+const description = "Browse handmade felt ornaments, keyrings, hotpot mats, tea coasters and more from Nepal. Enquire about any piece, retail or wholesale.";
+const crumbs = [
+  { name: "Home", path: "/" },
+  { name: "Products", path: "/products/" },
+];
+---
+
+<BaseLayout
+  title={`Handmade Felt Products | ${settings.businessName}`}
+  description={description}
+  path="/products/"
+  jsonLd={[breadcrumbLd(crumbs), collectionLd("All products", description, "/products/", products)]}
+>
+  <div class="wrap pb-20 pt-8 lg:pb-32">
+    <Breadcrumbs items={crumbs} />
+    <h1 class="mt-6 text-title">The collection</h1>
+    <p class="mt-4 max-w-2xl text-lead">Every piece is shaped by hand from felt in Nepal. Choose a category or search for something particular.</p>
+    <div class="mt-8"><CategoryNav categories={categories} /></div>
+    <div class="mt-6"><ProductGrid products={products} /></div>
+  </div>
+</BaseLayout>

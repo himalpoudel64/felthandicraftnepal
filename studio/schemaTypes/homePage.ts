@@ -1,0 +1,208 @@
+import { defineArrayMember, defineField, defineType } from "sanity";
+
+const titledItem = (name: string, titleLabel: string) =>
+  defineArrayMember({
+    type: "object",
+    name,
+    fields: [
+      defineField({
+        name: "title",
+        title: titleLabel,
+        type: "string",
+        validation: (rule) => rule.required(),
+      }),
+      defineField({
+        name: "text",
+        title: "Text",
+        type: "text",
+        rows: 3,
+        validation: (rule) => rule.required(),
+      }),
+    ],
+    preview: { select: { title: "title", subtitle: "text" } },
+  });
+
+export const homePage = defineType({
+  name: "homePage",
+  title: "Home Page",
+  type: "document",
+  groups: [
+    { name: "hero", title: "Top of page", default: true },
+    { name: "story", title: "Our story" },
+    { name: "products", title: "Products" },
+    { name: "impact", title: "Our impact" },
+    { name: "contact", title: "Contact" },
+  ],
+  fields: [
+    defineField({
+      name: "heroSlides",
+      title: "Slideshow images",
+      type: "array",
+      group: "hero",
+      description:
+        "Wide photos, at least 2000 pixels across. Drag to reorder. Make the first one your best photo of someone at work, because it loads first.",
+      of: [defineArrayMember({ type: "heroSlide" })],
+      validation: (rule) => rule.required().min(1),
+    }),
+    defineField({
+      name: "heroHeadline",
+      title: "Headline",
+      type: "string",
+      group: "hero",
+      description: "The sentence after the first full stop is set in italics.",
+      initialValue: "Empowering Women. Preserving Tradition.",
+      validation: (rule) => rule.required().max(80),
+    }),
+    defineField({
+      name: "heroText",
+      title: "Supporting text",
+      type: "text",
+      rows: 3,
+      group: "hero",
+      initialValue:
+        "Every piece tells a story of creativity, craftsmanship and opportunity. Discover handmade felt creations crafted by skilled Nepali women artisans.",
+      validation: (rule) => rule.required().max(220),
+    }),
+    defineField({
+      name: "heroPrimaryLabel",
+      title: "Main button text",
+      type: "string",
+      group: "hero",
+      description: "Links to the products page.",
+      initialValue: "Explore Our Collection",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "heroSecondaryLabel",
+      title: "Second button text",
+      type: "string",
+      group: "hero",
+      description: "Links to the about page.",
+      initialValue: "Our Story",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "storyTitle",
+      title: "Title",
+      type: "string",
+      group: "story",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "storyText",
+      title: "Text",
+      type: "text",
+      rows: 5,
+      group: "story",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "storyLinkLabel",
+      title: "Link text",
+      type: "string",
+      group: "story",
+      initialValue: "Read our story",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({ name: "storyImage", title: "Main photo", type: "altImage", group: "story" }),
+    defineField({
+      name: "storyDetailImage",
+      title: "Small close-up photo",
+      type: "altImage",
+      group: "story",
+    }),
+    defineField({
+      name: "categoriesTitle",
+      title: "Categories heading",
+      type: "string",
+      group: "products",
+      initialValue: "Our collection",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "featuredTitle",
+      title: "Featured products heading",
+      type: "string",
+      group: "products",
+      initialValue: "Featured pieces",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "featuredProducts",
+      title: "Featured products",
+      type: "array",
+      group: "products",
+      description: "Up to 8. If empty, products ticked Featured are shown instead.",
+      of: [
+        defineArrayMember({
+          type: "reference",
+          to: [{ type: "product" }],
+          options: { filter: 'status == "published"' },
+        }),
+      ],
+      validation: (rule) => rule.max(8).unique(),
+    }),
+    defineField({
+      name: "impactTitle",
+      title: "Title",
+      type: "string",
+      group: "impact",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({ name: "impactText", title: "Introduction", type: "text", rows: 3, group: "impact" }),
+    defineField({ name: "impactImage", title: "Workshop photo", type: "altImage", group: "impact" }),
+    defineField({
+      name: "impactItems",
+      title: "Points",
+      type: "array",
+      group: "impact",
+      description: "Only use claims you can stand behind.",
+      of: [titledItem("impactItem", "Title")],
+    }),
+    defineField({
+      name: "impactStats",
+      title: "Verified figures (optional)",
+      type: "array",
+      group: "impact",
+      description:
+        "Only add a number you can prove, such as the number of women employed. Nothing shows here if this is empty.",
+      of: [
+        defineArrayMember({
+          type: "object",
+          name: "impactStat",
+          fields: [
+            defineField({
+              name: "value",
+              title: "Number",
+              type: "string",
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "label",
+              title: "What it counts",
+              type: "string",
+              validation: (rule) => rule.required(),
+            }),
+          ],
+          preview: { select: { title: "value", subtitle: "label" } },
+        }),
+      ],
+    }),
+    defineField({
+      name: "contactTitle",
+      title: "Title",
+      type: "string",
+      group: "contact",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "contactText",
+      title: "Text",
+      type: "text",
+      rows: 3,
+      group: "contact",
+      validation: (rule) => rule.required(),
+    }),
+  ],
+  preview: { prepare: () => ({ title: "Home Page" }) },
+});

@@ -1,0 +1,63 @@
+---
+import EmailEnquiryForm from "../components/EmailEnquiryForm.astro";
+import WhatsAppIcon from "../components/WhatsAppIcon.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getContent } from "../lib/sanity";
+import { GENERAL_MESSAGE, whatsappUrl } from "../lib/whatsapp";
+
+const { settings } = await getContent();
+const whatsapp = whatsappUrl(settings.whatsappNumber, GENERAL_MESSAGE);
+const steps = [
+  ["Tell us what you need", "A single piece, a wholesale quantity or a custom design."],
+  ["We reply with details", "We confirm prices, sizes and what is possible."],
+  ["Agree the order together", "Everything is arranged directly with us. There is no online payment."],
+];
+const address = settings.address && Object.values(settings.address).filter(Boolean).join(", ");
+---
+
+<BaseLayout
+  title={`Contact and Wholesale Enquiries | ${settings.businessName}`}
+  description="Ask about handmade felt products from Nepal, wholesale orders or custom designs. Reach us by WhatsApp or email."
+  path="/contact/"
+>
+  <div class="wrap grid-12 gap-y-12 pb-20 pt-10 lg:pb-32 lg:pt-16">
+    <div class="col-span-12 lg:col-span-5">
+      <h1 class="text-title">Let&rsquo;s talk felt</h1>
+      <p class="mt-5 max-w-md text-lead">Product questions, wholesale requirements and custom orders are all welcome.</p>
+
+      <ul class="mt-8">
+        <li class="border-t border-rule">
+          <a href={whatsapp} target="_blank" rel="noopener" class="flex items-center gap-3 py-4 font-medium hover:text-terracotta-ink">
+            <WhatsAppIcon class="h-5 w-5 text-whatsapp" /> WhatsApp {settings.phone || `+${settings.whatsappNumber}`}
+          </a>
+        </li>
+        <li class="border-t border-rule">
+          <a href={`mailto:${settings.email}`} class="block break-words py-4 font-medium hover:text-terracotta-ink">{settings.email}</a>
+        </li>
+        {address && <li class="border-t border-rule py-4">{address}</li>}
+        {settings.socialLinks?.map((link) => <li class="border-t border-rule"><a href={link.url} rel="noopener me" class="block py-4 font-medium hover:text-terracotta-ink">{link.label}</a></li>)}
+      </ul>
+
+      <h2 class="mt-10 border-t border-rule pt-8 text-sub">How an enquiry works</h2>
+      <ol class="mt-4 space-y-4">
+        {
+          steps.map(([title, text], i) => (
+            <li class="flex gap-4">
+              <span class="font-serif text-lead text-terracotta-ink" aria-hidden="true">{i + 1}</span>
+              <span><span class="block font-medium">{title}</span><span class="block text-[0.9375rem] text-ink-soft">{text}</span></span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <div class="col-span-12 lg:col-span-6 lg:col-start-7">
+      <div class="patch patch-ivory border border-rule p-6 sm:p-10" style="--stitch-inset:.5rem">
+        <div class="relative z-10">
+          <h2 class="mb-6 text-sub">Send us a message</h2>
+          <EmailEnquiryForm idPrefix="contact" email={settings.email} businessName={settings.businessName} whatsappUrl={whatsapp} />
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

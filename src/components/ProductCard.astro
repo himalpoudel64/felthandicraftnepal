@@ -1,0 +1,32 @@
+---
+import { startingPrice } from "../lib/format";
+import { productPath } from "../lib/paths";
+import type { Product } from "../lib/types";
+import SanityImage from "./SanityImage.astro";
+
+interface Props {
+  product: Product;
+  sizes: string;
+  aspect?: number;
+  tone?: number;
+  showSummary?: boolean;
+  headingLevel?: "h2" | "h3";
+}
+
+const { product, sizes, aspect = 4 / 5, tone = 0, showSummary = true, headingLevel = "h3" } = Astro.props;
+const Heading = headingLevel;
+const price = startingPrice(product);
+---
+
+<a href={productPath(product)} class="group block">
+  <div class="tile-frame">
+    <SanityImage image={product.images?.[0]} sizes={sizes} aspect={aspect} tone={tone} label="Sample product, photograph coming soon" />
+  </div>
+  <p class="mt-3 text-sm text-ink-soft">{product.category.title}</p>
+  <Heading class="mt-0.5 font-serif text-xl leading-tight group-hover:text-terracotta-ink">{product.name}</Heading>
+  {showSummary && product.shortDescription && <p class="mt-2 line-clamp-2 text-[0.9375rem] leading-snug text-ink-soft">{product.shortDescription}</p>}
+  <p class="mt-2 flex flex-wrap items-baseline justify-between gap-x-3 text-[0.9375rem]">
+    {price && <span class="font-medium">{price}</span>}
+    <span class="underline decoration-1 underline-offset-4">View Details</span>
+  </p>
+</a>

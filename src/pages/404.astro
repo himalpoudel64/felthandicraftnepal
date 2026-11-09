@@ -1,0 +1,22 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { categoryPath } from "../lib/paths";
+import { getContent } from "../lib/sanity";
+
+const { settings, categories } = await getContent();
+---
+
+<BaseLayout title={`Page Not Found | ${settings.businessName}`} description="This page could not be found." path="/404/" noindex>
+  <div class="wrap py-20 lg:py-32">
+    <h1 class="text-title">This thread has come loose</h1>
+    <p class="mt-5 max-w-lg text-lead">We could not find that page. It may have moved, or the piece may no longer be available.</p>
+    <div class="mt-7 flex flex-wrap gap-3">
+      <a href="/products/" class="btn btn-primary">Browse products</a>
+      <a href="/" class="btn btn-ghost">Go to the home page</a>
+    </div>
+    <div class="felt-strip mt-14"></div>
+    <ul class="mt-8 flex flex-wrap gap-2">
+      {categories.map((category) => <li><a href={categoryPath(category)} class="chip">{category.title}</a></li>)}
+    </ul>
+  </div>
+</BaseLayout>

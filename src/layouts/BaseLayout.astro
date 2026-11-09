@@ -1,0 +1,84 @@
+---
+import { Font } from "astro:assets";
+import "../styles/global.css";
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import WhatsAppButton from "../components/WhatsAppButton.astro";
+import { absoluteUrl } from "../lib/paths";
+import { getContent } from "../lib/sanity";
+import { organizationLd, socialImage, websiteLd, type PageSeo } from "../lib/seo";
+
+interface Props extends PageSeo {
+  preloadImage?: { src: string; srcset: string; sizes: string } | null;
+}
+
+const { title, description, path, image, noindex, jsonLd = [], preloadImage } = Astro.props;
+const content = await getContent();
+const { settings } = content;
+const canonical = absoluteUrl(path);
+const og = socialImage(image, settings);
+const schema = [...(path === "/" ? [organizationLd(settings), websiteLd(settings)] : []), ...jsonLd];
+const usesCdn = preloadImage?.src.startsWith("https://cdn.sanity.io");
+// Keeps "<" out of the script body, whatever the CMS contains.
+const safeJson = (data: object) => JSON.stringify(data).replace(/</g, "\\u003c");
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#F7F2E8" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    {settings.googleVerification && <meta name="google-site-verification" content={settings.googleVerification} />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={settings.businessName} />
+    <meta property="og:locale" content="en" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {og && <meta property="og:image" content={og} />}
+    {og && <meta property="og:image:width" content="1200" />}
+    {og && <meta property="og:image:height" content="630" />}
+    <meta name="twitter:card" content={og ? "summary_large_image" : "summary"} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {og && <meta name="twitter:image" content={og} />}
+
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
+
+    <Font cssVariable="--font-fraunces" preload={[{ style: "normal" }]} />
+    <Font cssVariable="--font-dm-sans" preload={[{ weight: 400 }]} />
+
+    {usesCdn && <link rel="preconnect" href="https://cdn.sanity.io" crossorigin="anonymous" />}
+    {
+      preloadImage && (
+        <link
+          rel="preload"
+          as="image"
+          imagesrcset={preloadImage.srcset}
+          imagesizes={preloadImage.sizes}
+          fetchpriority="high"
+        />
+      )
+    }
+    {schema.map((data) => <script is:inline type="application/ld+json" set:html={safeJson(data)} />)}
+  </head>
+  <body>
+    <a href="#main" class="sr-only z-50 bg-ink p-3 text-ivory focus:not-sr-only focus:absolute focus:left-3 focus:top-3">
+      Skip to content
+    </a>
+    <Header content={content} />
+    <main id="main" class="flex-1" tabindex="-1">
+      <slot />
+    </main>
+    <Footer content={content} />
+    <WhatsAppButton number={settings.whatsappNumber} />
+  </body>
+</html>

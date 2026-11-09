@@ -1,0 +1,107 @@
+---
+import PortableText from "../components/PortableText.astro";
+import SanityImage from "../components/SanityImage.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { imageProps } from "../lib/images";
+import { getContent } from "../lib/sanity";
+import { describe } from "../lib/seo";
+
+const { settings, about } = await getContent();
+const [lead, ...rest] = about.images ?? [];
+const LEAD_SIZES = "(min-width: 1024px) 50vw, 100vw";
+const pillars = [
+  { title: "Our mission", text: about.mission, style: "" },
+  { title: "Our vision", text: about.vision, style: "--patch-bg:var(--color-forest)" },
+].filter((pillar) => pillar.text);
+---
+
+<BaseLayout
+  title={`About Us: Women Artisans in Nepal | ${settings.businessName}`}
+  description={describe(about.intro ?? settings.footerDescription ?? settings.businessName)}
+  path="/about/"
+  image={lead}
+  preloadImage={imageProps(lead, { sizes: LEAD_SIZES, aspect: 5 / 4 })}
+>
+  <section class="wrap grid-12 items-end gap-y-8 pb-16 pt-10 lg:pb-24 lg:pt-16">
+    <div class="col-span-12 lg:col-span-6">
+      <h1 class="text-title">{about.heading}</h1>
+      {about.intro && <p class="mt-6 max-w-xl text-lead">{about.intro}</p>}
+    </div>
+    <div class="col-span-12 lg:col-span-6">
+      <SanityImage image={lead} sizes={LEAD_SIZES} aspect={5 / 4} eager />
+      {lead?.credit && <p class="mt-1 text-xs text-ink-soft">{lead.credit}</p>}
+    </div>
+  </section>
+
+  {
+    about.story?.length && (
+      <section class="wrap grid-12 gap-y-6 pb-16 lg:pb-24">
+        <h2 class="col-span-12 text-section lg:col-span-4">Our story</h2>
+        <PortableText blocks={about.story} class="col-span-12 max-w-2xl lg:col-span-7 lg:col-start-6" />
+      </section>
+    )
+  }
+
+  {
+    pillars.length > 0 && (
+      <section class="wrap grid gap-4 pb-16 md:grid-cols-2 lg:pb-24">
+        {pillars.map((pillar) => (
+          <div class="patch p-8 lg:p-12" style={pillar.style}>
+            <h2 class="text-sub">{pillar.title}</h2>
+            <p class="mt-4">{pillar.text}</p>
+          </div>
+        ))}
+      </section>
+    )
+  }
+
+  {
+    about.socialImpact && (
+      <section class="bg-beige">
+        <div class="wrap grid-12 gap-y-6 py-16 lg:py-24">
+          <h2 class="col-span-12 text-section lg:col-span-5">What the work makes possible</h2>
+          <p class="col-span-12 max-w-2xl text-lead lg:col-span-6 lg:col-start-7">{about.socialImpact}</p>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    (about.processSteps?.length ?? 0) > 0 && (
+      <section class="wrap py-16 lg:py-24">
+        <h2 class="text-section">How it is made</h2>
+        <ol class="mt-8">
+          {about.processSteps?.map((step, i) => (
+            <li class="grid-12 gap-y-2 border-t border-rule py-6" data-reveal>
+              <span class="col-span-2 font-serif text-sub text-terracotta-ink lg:col-span-1" aria-hidden="true">{i + 1}</span>
+              <h3 class="col-span-10 text-sub lg:col-span-4">{step.title}</h3>
+              <p class="col-span-10 col-start-3 max-w-xl lg:col-span-6 lg:col-start-7">{step.text}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )
+  }
+
+  {
+    rest.length > 0 && (
+      <section class="wrap grid-12 gap-y-4 pb-20 lg:pb-32">
+        {rest.map((image, i) => (
+          <div class:list={["col-span-12 sm:col-span-6", i % 2 === 1 && "lg:mt-16"]}>
+            <SanityImage image={image} sizes="(min-width: 640px) 50vw, 100vw" aspect={4 / 3} />
+            {image.credit && <p class="mt-1 text-xs text-ink-soft">{image.credit}</p>}
+          </div>
+        ))}
+      </section>
+    )
+  }
+
+  <section class="wrap pb-20 lg:pb-32">
+    <div class="felt-strip mb-8"></div>
+    <p class="max-w-2xl font-serif text-section">See what the workshop makes, or tell us what you need.</p>
+    <div class="mt-6 flex flex-wrap gap-3">
+      <a href="/products/" class="btn btn-primary">Browse products</a>
+      <a href="/contact/" class="btn btn-ghost">Contact us</a>
+    </div>
+  </section>
+</BaseLayout>

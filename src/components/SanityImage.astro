@@ -1,0 +1,50 @@
+---
+import { imageProps } from "../lib/images";
+import type { ImageData } from "../lib/types";
+
+interface Props {
+  image: ImageData | undefined;
+  sizes: string;
+  aspect?: number;
+  widths?: number[];
+  eager?: boolean;
+  /** Shown on the placeholder when there is no photograph yet. */
+  label?: string;
+  tone?: number;
+  class?: string;
+}
+
+const { image, sizes, aspect, widths, eager = false, label, tone = 0, class: className } = Astro.props;
+const img = imageProps(image, { sizes, aspect, widths });
+const tones = [
+  "--patch-bg:var(--color-terracotta);--patch-fg:var(--color-ink);--patch-stitch:rgb(48 39 33 / .55)",
+  "--patch-bg:var(--color-forest)",
+  "--patch-bg:var(--color-mustard);--patch-fg:var(--color-ink);--patch-stitch:rgb(48 39 33 / .55)",
+  "--patch-bg:var(--color-burgundy)",
+];
+---
+
+{
+  img ? (
+    <img
+      src={img.src}
+      srcset={img.srcset}
+      sizes={img.sizes}
+      width={img.width}
+      height={img.height}
+      alt={img.alt}
+      loading={eager ? "eager" : "lazy"}
+      decoding="async"
+      fetchpriority={eager ? "high" : undefined}
+      class:list={["h-auto w-full bg-beige object-cover", className]}
+      style={aspect ? `aspect-ratio:${aspect}` : undefined}
+    />
+  ) : (
+    <div
+      class:list={["patch flex w-full items-center justify-center p-6 text-center", className]}
+      style={`aspect-ratio:${aspect ?? 4 / 5};${tones[tone % tones.length]}`}
+    >
+      <p class="relative text-sm">{label ?? "Photograph coming soon"}</p>
+    </div>
+  )
+}

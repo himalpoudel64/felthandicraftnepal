@@ -1,0 +1,46 @@
+---
+import type { PortableBlock, PortableSpan } from "../lib/types";
+
+interface Props {
+  blocks: PortableBlock[] | undefined;
+  class?: string;
+}
+
+const { blocks = [], class: className } = Astro.props;
+
+type Group = { kind: "block"; block: PortableBlock } | { kind: "list"; ordered: boolean; items: PortableBlock[] };
+
+const groups: Group[] = [];
+for (const block of blocks) {
+  if (block._type !== "block") continue;
+  const last = groups[groups.length - 1];
+  const ordered = block.listItem === "number";
+  if (!block.listItem) groups.push({ kind: "block", block });
+  else if (last?.kind === "list" && last.ordered === ordered) last.items.push(block);
+  else groups.push({ kind: "list", ordered, items: [block] });
+}
+
+const escapeHtml = (text: string) =>
+  text.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c] as string);
+
+function spanHtml(span: PortableSpan): string {
+  let html = escapeHtml(span.text);
+  if (span.marks?.includes("em")) html = `<em>${html}</em>`;
+  if (span.marks?.includes("strong")) html = `<strong>${html}</strong>`;
+  return html;
+}
+
+const inner = (block: PortableBlock) => block.children.map(spanHtml).join("");
+---
+
+<div class:list={["prose-cms", className]}>
+  {
+    groups.map((group) => {
+      if (group.kind === "block") {
+        return group.block.style === "h3" ? <h3 set:html={inner(group.block)} /> : <p set:html={inner(group.block)} />;
+      }
+      const List = group.ordered ? "ol" : "ul";
+      return <List>{group.items.map((item) => <li set:html={inner(item)} />)}</List>;
+    })
+  }
+</div>

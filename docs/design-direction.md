@@ -1,100 +1,108 @@
 # Design direction
 
-Bishnu Laxmi Felt Handicraft is an independent artisan label. The site should read like a printed lookbook from a small workshop: big photographs, confident type, thin rules and a lot of ivory paper.
+Bishnu Laxmi Felt Handicraft should feel like a confident artisan label that happens to have a website: large photographs of people and work, thick editorial type, and details taken from the craft itself.
 
-## Status of the brief
+## What the research showed
 
-`brief.md` was not available when this site was built. Section order and copy come from the build prompt. Seven category names (Purse, Bags, Hats, Ornaments, Key Rings and Key Chains, Hotpot, Tea Coaster) were supplied by the client, and Animals and Figures was added for the free-standing pieces in the client's photographs. Product names and descriptions were written from those photographs. Everything that would need real knowledge of the business is labelled "Sample text" in the seed data. The few fixed lines in `lib/copy.ts` restate only what the build prompt says about the business and should be checked against the real brief.
+Reviewed in November 2026: nuptsecraft.com.np, kalpanacraft.com, subhasagun.com and handmadefeltnepal.com. helpinghandfeltcraft.com no longer resolves in DNS, so it could not be reviewed.
 
-## Colour tokens
+| Common in the industry | What this site does instead |
+| --- | --- |
+| Long keyword-named categories, up to 18 sub-groups | A few plain categories, shown as large image tiles |
+| Products as image and title, with no link or no price | Every product has its own page with sizes, prices and an enquiry path |
+| "Request a quote" wording that changes from page to page | One enquiry action, two clear routes: WhatsApp or email |
+| Unverified claims: artisan counts, fair-wage statements, awards | No number appears unless the business enters it in the CMS |
+| Artisans mentioned in passing | The artisan's hands and face lead the home page |
+| Template blocks: slider, three columns, testimonials | An asymmetrical layout built from one material idea |
 
-Defined in `app/globals.css` as CSS variables through Tailwind's `@theme`.
+Subhasagun's short description of how an enquiry works is the one pattern worth keeping, and the contact page has a plain version of it.
 
-| Token | Value | Use | Contrast on ivory |
-| --- | --- | --- | --- |
-| `ivory` | `#F6EEDF` | Page background | n/a |
-| `paper` | `#FBF6EC` | Form fields, dialog | n/a |
-| `sand` | `#E8DCC6` | Quiet panels | n/a |
-| `rule` | `#CFC1A8` | Hairlines, input-adjacent rules | decorative |
-| `line` | `#7D6B5C` | Form control borders | 4.4:1 |
-| `ink` | `#2A1F1B` | Text | 13.9:1 |
-| `ink-soft` | `#5A4A41` | Secondary text | 7.3:1 |
-| `burgundy` | `#6B1D2A` | Brand: hero plate, primary button, sparingly | 9.9:1 |
-| `terracotta` | `#C4572F` | Fills and rules only | 3.8:1, fails for body text |
-| `terracotta-ink` | `#A3401C` | Terracotta as text and links | 5.5:1 |
-| `mustard` | `#D9A441` | Fills, and text on burgundy or ink only | 1.95:1 on ivory and 4.3:1 on forest, so never text there. 5.1:1 on burgundy |
-| `forest` | `#2F4A3A` | Impact band | 8.4:1 |
+## The idea: sewn from felt
 
-No gradients. Dark bands are flat colour. Text never sits directly on a photograph: the hero headline is on a solid burgundy plate that overlaps the image. The header sits over the hero on a flat tint.
+Two details from the real products carry the identity:
+
+1. **The stitched patch.** A flat colour panel with a running stitch inset from its edge, like a label sewn on by hand. It holds the hero headline and the category names, so text stays readable over any photograph a client uploads.
+2. **The felt-ball strip.** A row of touching circles in the brand colours, taken from the client's felt ball mats. It appears as a section divider, never as decoration on top of content.
+
+Everything else is quiet: ivory paper, thin rules, no shadows, no rounded cards.
+
+## Colour
+
+Defined as CSS variables through Tailwind's `@theme` in `src/styles/global.css`.
+
+| Token | Value | Use |
+| --- | --- | --- |
+| `ivory` | `#F7F2E8` | Page background |
+| `paper` | `#FCF9F2` | Fields and dialogs |
+| `beige` | `#E9DFCE` | Alternate sections |
+| `rule` | `#D4C7B1` | Hairlines |
+| `line` | `#7D6B5C` | Form control borders |
+| `ink` | `#302721` | Text |
+| `ink-soft` | `#5D4E44` | Secondary text |
+| `burgundy` | `#702A38` | Primary brand colour |
+| `burgundy-deep` | `#57202B` | Hover state, footer accents |
+| `terracotta` | `#C65F3A` | Fills and rules only |
+| `terracotta-ink` | `#A8461F` | Terracotta used as text |
+| `mustard` | `#D9AA45` | Fills, and text on burgundy or ink only |
+| `forest` | `#405B48` | Impact section |
+| `whatsapp` | `#1A9E4B` | WhatsApp button only |
+
+The suggested palette is used unchanged, with `terracotta-ink` added because terracotta on ivory fails AA for body text. Vivid colour comes from the products. Most sections stay ivory.
 
 ## Type
 
-Fraunces 400 (headings) and DM Sans 400 and 500 (UI and body), self-hosted through `next/font`. The variable Fraunces with optical sizing cost 68 KB against 18 KB for the static weight, and pushed LCP over budget, so the static weight is used.
+Fraunces 400 and 400 italic for headings, DM Sans 400 and 500 for text and interface. All four files are self-hosted static Latin subsets in `src/assets/fonts`, about 18 to 23 KB each. Only the upright heading font and the regular body font are preloaded.
 
 | Step | Size | Used for |
 | --- | --- | --- |
-| `display` | `clamp(2.375rem, 5.6vw, 5.25rem)` | Hero headline, on its plate |
-| `h1` | `clamp(2.5rem, 6vw, 5rem)` | Page titles |
-| `h2` | `clamp(2rem, 4.2vw, 3.5rem)` | Section titles |
-| `h3` | `clamp(1.375rem, 2vw, 1.75rem)` | Sub-sections, process steps |
-| `lead` | `clamp(1.1875rem, 1.6vw, 1.4375rem)` | Intros |
+| `display` | `clamp(2.5rem, 5.1vw, 5rem)` | Hero headline |
+| `title` | `clamp(2.5rem, 6vw, 5rem)` | Page titles |
+| `section` | `clamp(2rem, 4.2vw, 3.5rem)` | Section titles |
+| `sub` | `clamp(1.375rem, 2vw, 1.75rem)` | Sub-sections |
+| `lead` | `clamp(1.1875rem, 1.6vw, 1.4375rem)` | Introductions |
 | body | `1.0625rem / 1.65` | Running text |
-| small | `0.875rem` | Labels, captions, breadcrumbs |
 
-Headings are set tight (line-height about 1, slight negative tracking). No all-caps eyebrow labels above every heading.
+The second sentence of the hero headline is set in italic, which gives the page its voice.
 
-## Grid
+## Layout
 
-12 columns, `1.5rem` gutter on desktop, side margin `clamp(1.25rem, 4vw, 3.5rem)`, maximum width 1440px. Sections deliberately break the grid differently:
+12 columns, maximum width 1440px, margins `clamp(1.25rem, 4vw, 3.5rem)`.
 
-- **Hero:** full-bleed image with a burgundy plate overlapping its lower edge.
-- **About teaser:** statement across seven columns, image offset and overlapping the next section.
-- **Collection:** mosaic of eight tiles with spans 7/5, 4/8, 3/5/4, 12.
-- **Featured:** sticky heading on the left, two staggered columns on the right.
-- **Impact:** full-bleed forest band, ruled list with very large words.
-- **Contact:** text left, form right, on bare ivory.
+- **Hero:** full-bleed photograph, with a wide, shallow stitched patch overlapping only its lower edge, so the person in the photograph stays visible.
+- **Our story:** a large statement on the left, a tall photograph offset on the right, with a small close-up overlapping it.
+- **Collection:** a mosaic where every tile is a different size, each with a stitched name patch.
+- **Featured:** a sticky heading beside two staggered columns of products.
+- **Impact:** a forest band, with a full-height photograph on one side and a ruled list on the other.
+- **Contact:** a burgundy band with WhatsApp and email as two large links.
 
-## Corners, borders, motion
+## Photography
 
-- Radius is 0 throughout, 2px on form controls.
-- Thin rules instead of shadows.
-- Motion is CSS only. `animation-timeline: view()` fades content in as it scrolls, and `scroll(root)` turns the header solid. Browsers without scroll timelines simply show the final state. Both are removed under `prefers-reduced-motion`.
-- The header state uses CSS `:has([data-hero])`, so no JavaScript is needed.
+Real product photographs are from the client. Photographs of people are temporary stock, listed in `docs/SETUP_GUIDE.md` and marked in the CMS, and each shows a visible credit. They show Nepali women weaving, because no suitably licensed photograph of felt being made in Nepal could be found. See the "Temporary photographs" section of the setup guide.
 
-## JavaScript islands
+## Motion
 
-Only these four are client components: `HeroCarousel`, `SizePicker`, `EnquiryDialog` with `EnquiryForm`, and `MobileMenu`. The product gallery is scroll-snap on mobile and a stack on desktop, with no JavaScript.
+Crossfade on the hero, a slow zoom on image tiles, a soft reveal as sections enter, and a header that turns solid on scroll. The reveal and the header use CSS scroll timelines, so they need no JavaScript and simply show the final state in browsers without them. All of it is removed under `prefers-reduced-motion`.
 
-## Component inventory
+## Component system
 
-| Component | Kind | Purpose |
+| Component | JavaScript | Purpose |
 | --- | --- | --- |
-| `Header` | Server | Logo, nav, CSS dropdown of categories |
-| `MobileMenu` | Client | Disclosure menu below 1024px |
-| `Footer` | Server | All categories, pages, contact |
-| `HeroCarousel` | Client | One image at a time, previous, next, dots, pause |
-| `CategoryGrid` | Server | Mosaic of category tiles |
-| `ProductCard` | Server | Image, name, lowest price |
-| `ProductGallery` | Server | Scroll-snap and stacked photographs |
-| `SizePicker` | Client | Native select, live price, opens enquiry |
-| `EnquiryDialog` | Client | Native `<dialog>` wrapper around the form |
-| `EnquiryForm` | Client | Web3Forms POST, WhatsApp link, mailto fallback |
-| `Breadcrumbs` | Server | Visible breadcrumb trail |
-| `JsonLd` | Server | Safe structured-data output |
-| `SanityImage` | Server | Native `<img>` with Sanity CDN `srcset`, or a flat placeholder |
-| `PortableText` | Server | Small renderer for CMS rich text |
+| `BaseLayout` | None | Head, metadata, structured data, skip link, header, footer |
+| `Header` | Small | Navigation, product dropdown, mobile dialog |
+| `Footer` | None | Introduction, links, categories, contact |
+| `HeroCarousel` | Small | One image at a time, previous, next, indicators, pause |
+| `CategoryGrid` | None | Mosaic of category tiles |
+| `ProductCard` | None | Image, name, category, summary, price, link |
+| `ProductGrid` | Small | Search, tag filter and live count |
+| `ProductGallery` | None | Scroll-snap on phones, stacked on desktop |
+| `EnquiryDialog` | Small | Size picker link-up, WhatsApp or email choice |
+| `EmailEnquiryForm` | Small | Validation and Web3Forms submission |
+| `WhatsAppButton` | None | Fixed contact button on every page |
+| `Breadcrumbs` | None | Visible trail on category and product pages |
+| `SanityImage` | None | `srcset` from the Sanity image CDN, or a stitched placeholder |
 
-## Content model
+Interactive parts are plain TypeScript inside Astro components, so no UI framework is sent to the browser.
 
-As specified in the build prompt, with two additions that the "reorder and unpublish" rule needs:
+## Prices
 
-- `product.sortOrder`: optional number for manual ordering inside a category.
-- `category.status`: published or hidden, because Sanity will not unpublish a category while products reference it.
-
-Documents: `category`, `product`, `siteSettings` (singleton), `homePage` (singleton), `aboutPage` (singleton). See `studio/schemas`.
-
-Home page featured products: the list on the Home Page document is used when it has entries. Otherwise products ticked "Featured" are shown, up to eight.
-
-## Image priority
-
-One image per page gets `fetchpriority="high"`: the first hero slide on the home page, and the primary photograph on product pages, which is that page's LCP element. Everything below the fold is lazy-loaded.
+A product can be marked "Prices are examples". Its price then carries a visible "sample" label, is left off product cards, and is left out of the data given to Google. This is how the demonstration prices stay honest until real ones are entered.

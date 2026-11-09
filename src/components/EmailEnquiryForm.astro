@@ -1,0 +1,188 @@
+---
+interface Props {
+  email: string;
+  businessName: string;
+  whatsappUrl: string;
+  /** Present in the product dialog. The values are filled in when the dialog opens. */
+  product?: { name: string; category: string; url: string };
+  idPrefix: string;
+}
+
+const { email, businessName, whatsappUrl, product, idPrefix } = Astro.props;
+const key = import.meta.env.PUBLIC_WEB3FORMS_KEY as string | undefined;
+const id = (name: string) => `${idPrefix}-${name}`;
+const labelClass = "mb-1 block text-sm font-medium";
+const errorClass = "mt-1 text-sm text-terracotta-ink";
+---
+
+<form
+  data-enquiry-form
+  data-key={key ?? ""}
+  data-email={email}
+  data-business={businessName}
+  data-product={product?.name}
+  data-category={product?.category}
+  data-url={product?.url}
+  novalidate
+  class="grid grid-cols-2 gap-x-4 gap-y-4"
+>
+  <div class="col-span-2">
+    <label for={id("name")} class={labelClass}>Full Name <span aria-hidden="true">*</span></label>
+    <input id={id("name")} name="name" autocomplete="name" required class="field" aria-describedby={id("name-error")} />
+    <p id={id("name-error")} data-error="name" class={errorClass} hidden></p>
+  </div>
+  <div class="col-span-2 sm:col-span-1">
+    <label for={id("email")} class={labelClass}>Email Address <span aria-hidden="true">*</span></label>
+    <input id={id("email")} name="email" type="email" autocomplete="email" required class="field" aria-describedby={id("email-error")} />
+    <p id={id("email-error")} data-error="email" class={errorClass} hidden></p>
+  </div>
+  <div class="col-span-2 sm:col-span-1">
+    <label for={id("phone")} class={labelClass}>Phone Number <span class="font-normal text-ink-soft">(optional)</span></label>
+    <input id={id("phone")} name="phone" type="tel" autocomplete="tel" class="field" />
+  </div>
+
+  {
+    product && (
+      <>
+        <div class="col-span-2">
+          <label for={id("product")} class={labelClass}>Product Name</label>
+          <input id={id("product")} name="product" readonly value={product.name} class="field" />
+        </div>
+        <div class="col-span-1">
+          <label for={id("size")} class={labelClass}>Selected Size</label>
+          <input id={id("size")} name="size" readonly class="field" data-field-size />
+        </div>
+        <div class="col-span-1">
+          <label for={id("price")} class={labelClass}>Selected Price</label>
+          <input id={id("price")} name="price" readonly class="field" data-field-price />
+        </div>
+      </>
+    )
+  }
+
+  <div class="col-span-2">
+    <label for={id("message")} class={labelClass}>Message <span class="font-normal text-ink-soft">(optional)</span></label>
+    <textarea id={id("message")} name="message" rows="3" class="field"></textarea>
+  </div>
+
+  <!-- Honeypot: hidden from people, tempting to bots. -->
+  <input type="checkbox" name="botcheck" tabindex="-1" aria-hidden="true" class="hidden" />
+
+  <div class="col-span-2">
+    <button type="submit" class="btn btn-primary w-full disabled:opacity-70 sm:w-auto">Send Enquiry</button>
+  </div>
+
+  <div role="status" data-status class="col-span-2 empty:hidden"></div>
+
+  <template data-success>
+    <p class="border-l-2 border-forest pl-3 text-forest">Thank you. Your enquiry has been sent and we will reply soon.</p>
+  </template>
+  <template data-failure>
+    <p class="border-l-2 border-terracotta pl-3">
+      Sorry, your enquiry could not be sent from here.
+      <a data-mailto class="link-rule font-medium">Email it to {email} instead</a>, with your details already filled in, or
+      <a href={whatsappUrl} target="_blank" rel="noopener" data-fallback-whatsapp class="link-rule font-medium">message us on WhatsApp</a>.
+    </p>
+  </template>
+</form>
+
+<script>
+  const ENDPOINT = "https://api.web3forms.com/submit";
+
+  document.querySelectorAll<HTMLFormElement>("[data-enquiry-form]").forEach((form) => {
+    const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    const status = form.querySelector<HTMLElement>("[data-status]");
+    const submitLabel = submit?.textContent ?? "";
+    let sending = false;
+
+    const value = (name: string) => String(new FormData(form).get(name) ?? "").trim();
+
+    function setError(name: string, message: string) {
+      const input = form.elements.namedItem(name) as HTMLInputElement;
+      const error = form.querySelector<HTMLElement>(`[data-error="${name}"]`);
+      if (message) input.setAttribute("aria-invalid", "true");
+      else input.removeAttribute("aria-invalid");
+      if (error) {
+        error.textContent = message;
+        error.hidden = !message;
+      }
+    }
+
+    function validate(): boolean {
+      const name = value("name") ? "" : "Please enter your full name.";
+      const email = !value("email")
+        ? "Please enter your email address."
+        : /^\S+@\S+\.\S+$/.test(value("email"))
+          ? ""
+          : "Please check this email address.";
+      setError("name", name);
+      setError("email", email);
+      const first = name ? "name" : email ? "email" : "";
+      if (first) (form.elements.namedItem(first) as HTMLElement).focus();
+      return !first;
+    }
+
+    function render(template: "success" | "failure"): void {
+      const node = form.querySelector<HTMLTemplateElement>(`template[data-${template}]`);
+      if (status && node) status.replaceChildren(node.content.cloneNode(true));
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (sending || !validate()) return;
+      status?.replaceChildren();
+      // A filled honeypot gets a quiet success, so bots learn nothing.
+      if (value("botcheck")) {
+        render("success");
+        return;
+      }
+
+      const { key = "", email: recipient = "", business = "", product, category, url } = form.dataset;
+      const subject = product ? `Product Enquiry – ${product}` : `Website Enquiry – ${value("name")}`;
+      const details: Record<string, string> = {
+        name: value("name"),
+        email: value("email"),
+        phone: value("phone") || "Not given",
+        ...(product
+          ? { product, category: category ?? "", size: value("size"), price: value("price"), "product link": url ?? "" }
+          : {}),
+        message: value("message") || "No message",
+      };
+
+      sending = true;
+      if (submit) {
+        submit.disabled = true;
+        submit.textContent = "Sending…";
+      }
+
+      try {
+        if (!key) throw new Error("Form key not configured");
+        const response = await fetch(ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({ access_key: key, subject, from_name: business, ...details }),
+        });
+        const result = (await response.json()) as { success?: boolean };
+        if (!response.ok || !result.success) throw new Error("Submission rejected");
+        render("success");
+        form.reset();
+        form.dispatchEvent(new CustomEvent("enquiry:sent"));
+      } catch {
+        render("failure");
+        const body = Object.entries(details).map(([label, text]) => `${label}: ${text}`).join("\n");
+        form
+          .querySelector("[data-mailto]")
+          ?.setAttribute("href", `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+        // In the product dialog, the fallback keeps the chosen product, size and price.
+        const productLink = form.closest("dialog")?.querySelector("[data-whatsapp]")?.getAttribute("href");
+        if (productLink) form.querySelector("[data-fallback-whatsapp]")?.setAttribute("href", productLink);
+      } finally {
+        sending = false;
+        if (submit) {
+          submit.disabled = false;
+          submit.textContent = submitLabel;
+        }
+      }
+    });
+  });
+</script>
