@@ -28,7 +28,8 @@ const optionClass = "flex min-h-24 w-full items-center gap-4 border border-ink p
   data-category={product.category.title}
   data-url={url}
   aria-labelledby="enquiry-title"
-  class="m-auto max-h-[92dvh] w-[min(36rem,calc(100vw-1.5rem))] max-w-none overflow-y-auto bg-paper p-0 text-ink"
+  aria-modal="true"
+  class="fixed inset-0 z-50 m-auto max-h-[92dvh] w-[min(36rem,calc(100vw-1.5rem))] max-w-none overflow-y-auto bg-paper p-0 text-ink"
 >
   <div class="p-6 sm:p-8">
     <div class="sticky -top-6 z-10 -mt-1 flex items-start justify-between gap-4 bg-paper py-1 sm:-top-8">
@@ -78,6 +79,35 @@ const optionClass = "flex min-h-24 w-full items-center gap-4 border border-ink p
   const dialog = document.querySelector<HTMLDialogElement>("dialog[data-enquiry]");
 
   if (dialog) {
+    /*
+     * Opened with show() rather than showModal(). A modal dialog sits in the browser's top layer,
+     * above everything, and hCaptcha adds its picture challenge to the end of <body>, so the
+     * challenge would open behind the form. Modal behaviour is provided here instead: the page
+     * behind is made inert, a backdrop closes the dialog, and Escape closes it.
+     */
+    const pageParts = [...document.body.children] as HTMLElement[];
+    const backdrop = document.createElement("div");
+    backdrop.className = "fixed inset-0 z-40 bg-ink/65";
+    backdrop.hidden = true;
+    document.body.append(backdrop, dialog);
+    let opener: HTMLElement | null = null;
+
+    const open = () => {
+      opener = document.activeElement as HTMLElement | null;
+      pageParts.forEach((part) => (part.inert = true));
+      backdrop.hidden = false;
+      dialog.show();
+    };
+    dialog.addEventListener("close", () => {
+      pageParts.forEach((part) => (part.inert = false));
+      backdrop.hidden = true;
+      opener?.focus();
+    });
+    backdrop.addEventListener("click", () => dialog.close());
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && dialog.open) dialog.close();
+    });
+
     const $ = <T extends HTMLElement>(selector: string) => dialog.querySelector<T>(selector);
     const sizes = document.querySelector<HTMLElement>("[data-sizes]");
     const choice = $("[data-view=choice]");
@@ -109,15 +139,12 @@ const optionClass = "flex min-h-24 w-full items-center gap-4 border border-ink p
       if (choice) choice.hidden = false;
       if (email) email.hidden = true;
       $("[data-status]")?.replaceChildren();
-      dialog.showModal();
+      open();
       $("#enquiry-title")?.focus();
     });
     $("[data-close]")?.addEventListener("click", () => dialog.close());
     $("[data-show-email]")?.addEventListener("click", () => showView("email"));
     $("[data-back]")?.addEventListener("click", () => showView("choice"));
-    dialog.addEventListener("click", (event) => {
-      if (event.target === dialog) dialog.close();
-    });
     // form.reset() restores attribute values, so the size stays filled in.
     sync();
   }
