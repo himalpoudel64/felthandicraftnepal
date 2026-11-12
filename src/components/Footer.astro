@@ -6,7 +6,7 @@ import { GENERAL_MESSAGE, whatsappUrl } from "../lib/whatsapp";
 interface Props {
   content: Content;
 }
-const { settings, categories } = Astro.props.content;
+const { settings, categories, legal } = Astro.props.content;
 const year = new Date().getFullYear();
 const whatsappDisplay = settings.phone || `+${settings.whatsappNumber}`;
 const heading = "mb-3 text-sm font-medium text-mustard";
@@ -47,9 +47,19 @@ const heading = "mb-3 text-sm font-medium text-mustard";
     </div>
   </div>
   <div class="wrap mt-12 lg:mt-16">
-    <div class="flex flex-wrap justify-between gap-x-6 gap-y-2 border-t border-ivory/25 pt-5 text-sm">
+    <!-- The right padding keeps everything clear of the fixed WhatsApp button. -->
+    <div class="flex flex-col gap-x-8 gap-y-2 border-t border-ivory/25 pt-5 text-sm lg:flex-row lg:flex-wrap lg:items-center lg:pr-28">
       <p>&copy; {year} {settings.businessName}. All rights reserved.</p>
-      <p>Designed by <a href="https://himalpoudel.com" class="link-rule" rel="noopener">Himal Poudel</a></p>
+      {
+        legal.length > 0 && (
+          <nav aria-label="Legal">
+            <ul class="flex flex-wrap gap-x-6 gap-y-1">
+              {legal.map((page) => <li><a class="link-rule" href={page.path}>{page.title}</a></li>)}
+            </ul>
+          </nav>
+        )
+      }
+      <p class="lg:ml-auto">Designed by <a href="https://himalpoudel.com" class="link-rule" rel="noopener">Himal Poudel</a></p>
     </div>
   </div>
 </footer>

@@ -111,6 +111,6 @@ The client sells retail and wholesale, and agrees every price after contact, so 
 
 Both email forms use hCaptcha through Web3Forms' free plan, plus a honeypot field. The hCaptcha script loads only when a visitor starts filling in a form, and a fixed-height slot keeps the page from moving when it appears.
 
-## Credit
+## Footer base
 
-The footer carries "Designed by Himal Poudel", linking to himalpoudel.com.
+The bottom row holds the copyright, links to the Privacy Policy and the Terms and Conditions, and "Designed by Himal Poudel", linking to himalpoudel.com. On desktop the row keeps clear space on the right so the fixed WhatsApp button never covers it. The legal pages are CMS documents, laid out like the other editorial pages: title and date on the left, text in a single readable column.

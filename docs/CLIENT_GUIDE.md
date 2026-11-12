@@ -10,6 +10,7 @@ On the left of the Studio you will see:
 - **Home Page:** the big photographs at the top, your story, your impact
 - **About Page:** your story, mission, vision and how things are made
 - **Site Settings:** your name, email, WhatsApp number and logo
+- **Privacy Policy** and **Terms and Conditions:** the two legal pages linked at the bottom of every page
 
 ## The most important thing to know
 
@@ -67,6 +68,12 @@ Some photographs of women at work are **temporary stock photos of weaving at oth
 To replace one, upload your photo, write the alt text, **clear the Photo credit**, **untick "This is a temporary stock photo"**, and press Publish.
 
 The best photographs show real hands and faces at work: shaping wool, stitching, cutting, working together. Please ask each person's permission before using their photograph.
+
+## Privacy Policy and Terms and Conditions
+
+Both pages were written to match how the website works today: enquiries by form, WhatsApp and email, no online payments, no prices shown, and no tracking. Please read them, and have them checked by someone qualified if you can.
+
+If something changes, for example you start selling online, add analytics or change your email address, update the text, change **Last updated** to the day's date, and press **Publish**.
 
 ## Good to know
 

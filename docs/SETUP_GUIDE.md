@@ -138,7 +138,7 @@ Open `studio/.env` and put the same project ID in `SANITY_STUDIO_PROJECT_ID`.
 npm run dev --prefix studio
 ```
 
-**Load the starting content.** Run these from the `studio` folder. The import uploads 25 photographs and creates 34 documents.
+**Load the starting content.** Run these from the `studio` folder. The import uploads 25 photographs and creates 36 documents, including the Privacy Policy and Terms and Conditions.
 
 ```bash
 cd studio
@@ -180,6 +180,7 @@ Steps 10 to 17 are the everyday tasks, and they are written out for the owner in
 | 15. Publish or hide | The green Publish button. To hide, set "Show on website?" to Hidden on the "Where it appears" tab, then Publish. |
 | 16. Homepage | Home Page |
 | 17. Site settings | Site Settings |
+| Legal pages | Privacy Policy and Terms and Conditions, at the bottom of the sidebar. Each appears on the website, in the footer and in the sitemap only once it is published. |
 
 ---
 
@@ -240,7 +241,7 @@ This makes the website rebuild when content is published.
 | URL | the deploy hook URL |
 | Dataset | `production` |
 | Trigger on | Create, Update, Delete |
-| Filter | `_type in ["category", "product", "siteSettings", "homePage", "aboutPage"]` |
+| Filter | `_type in ["category", "product", "siteSettings", "homePage", "aboutPage", "legalPage"]` |
 | Projection | leave empty |
 | HTTP method | POST |
 | HTTP headers | none |
@@ -333,6 +334,7 @@ Everything here is done in the Studio, followed by Publish. Wait a minute or two
 | **Missing images** | Check the `[content]` lines in the build log. Open the item, and confirm the photo is there and the document is published. |
 | **Invalid or duplicate slug** | Each web address must be unique within products, and within categories. Press Generate, or add a word. |
 | **Failed static build** | Open the failed deployment's log in Cloudflare and read the first error. Confirm `NODE_VERSION` is `24`. Run `npm run build` locally to reproduce it. |
+| **Privacy or terms link missing from the footer** | The document is not published, or its text is empty. Open it in the Studio and publish it. |
 | **Webhook does not fire** | In Sanity, read the webhook's attempts log. Confirm the URL, method POST, dataset and filter. Replace the deploy hook if it was deleted. |
 | **Email submission error** | Confirm `PUBLIC_WEB3FORMS_KEY` is set for Production, then redeploy. Check for a monthly limit in Web3Forms and check Spam in Gmail. |
 | **Captcha check does not appear** | Check the browser console for a Content-Security-Policy error and confirm `public/_headers` still allows `hcaptcha.com`. Ad blockers can also block it, and the form then offers email and WhatsApp links. |

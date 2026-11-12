@@ -8,7 +8,7 @@ const escapeXml = (text: string) =>
 export const GET: APIRoute = async () => {
   const content = await getContent();
   reportContentProblems(content);
-  const { home, about, categories, products, settings } = content;
+  const { home, about, categories, products, settings, legal } = content;
 
   const entries: { path: string; updated?: string }[] = [
     { path: "/", updated: home._updatedAt },
@@ -17,6 +17,7 @@ export const GET: APIRoute = async () => {
     { path: "/contact/", updated: settings._updatedAt },
     ...categories.map((category) => ({ path: categoryPath(category), updated: category._updatedAt })),
     ...products.map((product) => ({ path: productPath(product), updated: product._updatedAt })),
+    ...legal.map((page) => ({ path: page.path, updated: page._updatedAt })),
   ];
 
   const urls = entries

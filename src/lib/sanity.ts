@@ -2,12 +2,15 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { createClient } from "@sanity/client";
 import { DEFAULT_EMAIL, DEFAULT_WHATSAPP } from "./contact";
+import { LEGAL_PATHS } from "./paths";
 import { siteQuery } from "./queries";
 import type {
   About,
   Category,
   Content,
   ImageData,
+  LegalId,
+  LegalPage,
   Product,
   RawCategory,
   RawHome,
@@ -19,6 +22,7 @@ type Raw = {
   settings: Settings | null;
   home: RawHome | null;
   about: About | null;
+  legal: Omit<LegalPage, "path">[];
   categories: RawCategory[];
   products: RawProduct[];
 };
@@ -74,6 +78,7 @@ async function readSeed(): Promise<Raw> {
     settings: (find("siteSettings") ?? null) as Settings | null,
     home: home ? ({ ...home, featuredProducts: refs(home.featuredProducts) } as unknown as RawHome) : null,
     about: (find("aboutPage") ?? null) as About | null,
+    legal: docs.filter((doc) => doc._type === "legalPage") as unknown as Raw["legal"],
     categories: ofType("category").map((doc) => ({ ...doc, slug: slug(doc) }) as unknown as RawCategory),
     products: ofType("product").map(
       (doc) =>
@@ -134,6 +139,11 @@ function normalise(raw: Raw): Content {
     },
     home: { ...home, featured, more },
     about: raw.about ?? {},
+    // Each legal page appears only once it is published with some text.
+    legal: (Object.keys(LEGAL_PATHS) as LegalId[]).flatMap((id) => {
+      const page = raw.legal?.find((doc) => doc._id === id);
+      return page?.title && page.body?.length ? [{ ...page, path: LEGAL_PATHS[id] }] : [];
+    }),
     categories,
     products,
   };

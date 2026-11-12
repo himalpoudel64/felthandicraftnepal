@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useClient, type DocumentActionComponent, type DocumentActionProps } from "sanity";
+import { legalPages } from "../schemaTypes";
 
 const SITE = process.env.SANITY_STUDIO_SITE_URL ?? "https://felthandicraftnepal.com";
 
@@ -11,7 +12,7 @@ type Published = {
 };
 
 /** Opens the published page. The site is static, so only published content has a page. */
-export const viewOnWebsite: DocumentActionComponent = ({ published, type }: DocumentActionProps) => {
+export const viewOnWebsite: DocumentActionComponent = ({ id, published, type }: DocumentActionProps) => {
   const client = useClient({ apiVersion: "2025-02-19" });
   const doc = published as Published | null;
   const [categorySlug, setCategorySlug] = useState<string>();
@@ -40,7 +41,9 @@ export const viewOnWebsite: DocumentActionComponent = ({ published, type }: Docu
           ? "/"
           : type === "aboutPage"
             ? "/about/"
-            : undefined;
+            : type === "legalPage" && id in legalPages
+              ? legalPages[id as keyof typeof legalPages].path
+              : undefined;
 
   const open = useCallback(() => {
     if (path) window.open(`${SITE}${path}`, "_blank", "noopener");

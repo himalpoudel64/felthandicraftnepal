@@ -29,6 +29,9 @@ export const siteQuery = `{
     ...,
     "images": images[]${image}
   },
+  "legal": *[_id in ["privacyPolicy", "termsAndConditions"]]{
+    _id, _updatedAt, title, lastUpdated, body, seoDescription
+  },
   "categories": *[_type == "category" && status == "published"]
     | order(sortOrder asc, title asc){
       _id, _updatedAt, title, "slug": slug.current, description, "image": image${image}, ${seo}

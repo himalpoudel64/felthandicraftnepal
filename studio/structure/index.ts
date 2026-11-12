@@ -1,10 +1,11 @@
 import type { StructureBuilder, StructureResolver } from "sanity/structure";
+import { legalPages } from "../schemaTypes";
 
-const singleton = (S: StructureBuilder, type: string, title: string) =>
+const singleton = (S: StructureBuilder, type: string, title: string, id = type) =>
   S.listItem()
-    .id(type)
+    .id(id)
     .title(title)
-    .child(S.document().schemaType(type).documentId(type).title(title));
+    .child(S.document().schemaType(type).documentId(id).title(title));
 
 export const structure: StructureResolver = (S) =>
   S.list()
@@ -54,4 +55,6 @@ export const structure: StructureResolver = (S) =>
       singleton(S, "homePage", "Home Page"),
       singleton(S, "aboutPage", "About Page"),
       singleton(S, "siteSettings", "Site Settings"),
+      S.divider(),
+      ...Object.entries(legalPages).map(([id, page]) => singleton(S, "legalPage", page.title, id)),
     ]);

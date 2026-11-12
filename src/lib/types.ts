@@ -116,8 +116,21 @@ export type About = {
   images?: ImageData[];
 };
 
+export type LegalId = "privacyPolicy" | "termsAndConditions";
+
+export type LegalPage = {
+  _id: LegalId;
+  _updatedAt?: string;
+  title: string;
+  lastUpdated: string;
+  body: PortableBlock[];
+  seoDescription?: string;
+  path: string;
+};
+
 export type Content = {
   settings: Settings;
+  legal: LegalPage[];
   home: Omit<RawHome, "featuredProducts"> & { featured: Product[]; more: Product[] };
   about: About;
   categories: Category[];

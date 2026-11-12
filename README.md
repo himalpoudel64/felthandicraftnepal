@@ -43,7 +43,7 @@ With no Sanity project ID in `.env`, the site builds from `studio/seed/seed.ndjs
 ## Structure
 
 ```text
-src/pages         Routes: home, about, products, categories, products, contact, 404, sitemap, robots
+src/pages         Routes: home, about, products, categories, products, contact, privacy policy, terms, 404, sitemap, robots
 src/components    Astro components. Interactive parts are small inline scripts
 src/layouts       BaseLayout: head, metadata, structured data, header, footer
 src/lib           Sanity fetch and normalise, images, SEO, WhatsApp, formatting

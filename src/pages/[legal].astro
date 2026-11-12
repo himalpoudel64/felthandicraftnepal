@@ -1,0 +1,57 @@
+---
+import type { GetStaticPaths } from "astro";
+import PortableText from "../components/PortableText.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { plainText } from "../lib/format";
+import { getContent } from "../lib/sanity";
+import { describe } from "../lib/seo";
+import type { LegalPage } from "../lib/types";
+
+export const getStaticPaths = (async () => {
+  const { legal } = await getContent();
+  return legal.map((page) => ({ params: { legal: page.path.replaceAll("/", "") }, props: { page } }));
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props as { page: LegalPage };
+const { settings, legal } = await getContent();
+const updated = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(
+  new Date(`${page.lastUpdated}T00:00:00Z`),
+);
+const other = legal.filter((item) => item._id !== page._id);
+---
+
+<BaseLayout
+  title={`${page.title} | ${settings.businessName}`}
+  description={page.seoDescription || describe(plainText(page.body))}
+  path={page.path}
+>
+  <article class="wrap grid-12 gap-y-8 pb-20 pt-10 lg:pb-32 lg:pt-16">
+    <header class="col-span-12 lg:col-span-4">
+      <h1 class="text-title">{page.title}</h1>
+      <p class="mt-4 text-sm text-ink-soft">Last updated <time datetime={page.lastUpdated}>{updated}</time></p>
+      <div class="felt-strip mt-8 w-[144px]"></div>
+    </header>
+    <div class="col-span-12 max-w-2xl lg:col-span-7 lg:col-start-6">
+      <PortableText blocks={page.body} class="legal-text" />
+      <p class="mt-12 border-t border-rule pt-6 text-[0.9375rem]">
+        Questions? Email <a href={`mailto:${settings.email}`} class="link-rule">{settings.email}</a>.
+        {other.map((item) => <>{" "}See also our <a href={item.path} class="link-rule">{item.title}</a>.</>)}
+      </p>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .legal-text :global(h3) {
+    margin-top: 2.25em;
+    font-size: 1.5rem;
+  }
+
+  .legal-text :global(h3:first-child) {
+    margin-top: 0;
+  }
+
+  .legal-text :global(li + li) {
+    margin-top: 0.4em;
+  }
+</style>

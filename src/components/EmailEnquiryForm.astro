@@ -1,4 +1,6 @@
 ---
+import { getContent } from "../lib/sanity";
+
 interface Props {
   email: string;
   businessName: string;
@@ -13,6 +15,7 @@ const key = import.meta.env.PUBLIC_WEB3FORMS_KEY as string | undefined;
 const id = (name: string) => `${idPrefix}-${name}`;
 const labelClass = "mb-1 block text-sm font-medium";
 const errorClass = "mt-1 text-sm text-terracotta-ink";
+const privacy = (await getContent()).legal.find((page) => page._id === "privacyPolicy");
 ---
 
 <form
@@ -76,6 +79,13 @@ const errorClass = "mt-1 text-sm text-terracotta-ink";
 
   <div class="col-span-2">
     <button type="submit" class="btn btn-primary w-full disabled:opacity-70 sm:w-auto">Send Enquiry</button>
+    {
+      privacy && (
+        <p class="mt-3 text-sm text-ink-soft">
+          We use your details only to reply to you. See our <a href={privacy.path} class="link-rule">{privacy.title}</a>.
+        </p>
+      )
+    }
   </div>
 
   <div role="status" data-status class="col-span-2 empty:hidden"></div>
