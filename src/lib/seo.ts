@@ -108,9 +108,8 @@ export function collectionLd(name: string, description: string, path: string, pr
   };
 }
 
-/** Offers are left out while prices are only examples, so Google is never told a made-up price. */
+/** No offers: prices are agreed after contact, so none are published. */
 export function productLd(product: Product, settings: Settings) {
-  const prices = product.sizes.map((size) => size.price);
   const images = (product.images ?? []).flatMap((image) => plainImageUrl(image) ?? []);
   return {
     "@context": CONTEXT,
@@ -122,15 +121,7 @@ export function productLd(product: Product, settings: Settings) {
     category: product.category.title,
     keywords: product.tags?.length ? product.tags.join(", ") : undefined,
     brand: { "@type": "Brand", name: settings.businessName },
-    offers: product.samplePrice
-      ? undefined
-      : {
-          "@type": "AggregateOffer",
-          priceCurrency: "NPR",
-          lowPrice: Math.min(...prices),
-          highPrice: Math.max(...prices),
-          offerCount: prices.length,
-        },
+    size: product.sizes.length ? product.sizes.map((size) => size.label) : undefined,
   };
 }
 

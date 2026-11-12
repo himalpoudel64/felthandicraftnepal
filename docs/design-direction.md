@@ -9,7 +9,7 @@ Reviewed in November 2026: nuptsecraft.com.np, kalpanacraft.com, subhasagun.com 
 | Common in the industry | What this site does instead |
 | --- | --- |
 | Long keyword-named categories, up to 18 sub-groups | A few plain categories, shown as large image tiles |
-| Products as image and title, with no link or no price | Every product has its own page with sizes, prices and an enquiry path |
+| Products as image and title, with no link | Every product has its own page with sizes and an enquiry path |
 | "Request a quote" wording that changes from page to page | One enquiry action, two clear routes: WhatsApp or email |
 | Unverified claims: artisan counts, fair-wage statements, awards | No number appears unless the business enters it in the CMS |
 | Artisans mentioned in passing | The artisan's hands and face lead the home page |
@@ -92,7 +92,7 @@ Crossfade on the hero, a slow zoom on image tiles, a soft reveal as sections ent
 | `Footer` | None | Introduction, links, categories, contact |
 | `HeroCarousel` | Small | One image at a time, previous, next, indicators, pause |
 | `CategoryGrid` | None | Mosaic of category tiles |
-| `ProductCard` | None | Image, name, category, summary, price, link |
+| `ProductCard` | None | Image, name, category, summary, link |
 | `ProductGrid` | Small | Search, tag filter and live count |
 | `ProductGallery` | None | Scroll-snap on phones, stacked on desktop |
 | `EnquiryDialog` | Small | Size picker link-up, WhatsApp or email choice |
@@ -105,4 +105,12 @@ Interactive parts are plain TypeScript inside Astro components, so no UI framewo
 
 ## Prices
 
-A product can be marked "Prices are examples". Its price then carries a visible "sample" label, is left off product cards, and is left out of the data given to Google. This is how the demonstration prices stay honest until real ones are entered.
+The client sells retail and wholesale, and agrees every price after contact, so the site shows no prices anywhere: not on cards, product pages, enquiry messages or structured data. Sizes remain, and the chosen size travels with the enquiry. Each product page says that prices depend on quantity and are agreed directly.
+
+## Spam protection
+
+Both email forms use hCaptcha through Web3Forms' free plan, plus a honeypot field. The hCaptcha script loads only when a visitor starts filling in a form, and a fixed-height slot keeps the page from moving when it appears.
+
+## Credit
+
+The footer carries "Designed by Himal Poudel", linking to himalpoudel.com.

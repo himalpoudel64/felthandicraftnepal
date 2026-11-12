@@ -92,7 +92,7 @@ Press Ctrl+C in the terminal to stop it.
 npm run dev --prefix studio
 ```
 
-**7. Build the production website.** This writes the finished site to `dist/`, and also lists any missing images, alt text, sample prices and temporary stock photos.
+**7. Build the production website.** This writes the finished site to `dist/`, and also lists any missing images, alt text and temporary stock photos.
 
 ```bash
 npm run build
@@ -176,7 +176,7 @@ Steps 10 to 17 are the everyday tasks, and they are written out for the owner in
 | 11. Add products | Products by category, pick a category, then the pencil icon |
 | 12. Upload images | Product, then the Photos tab |
 | 13. Add alt text | Click a photo, then fill in Alt text. Publishing is blocked without it. |
-| 14. Sizes and prices | Product, then the Sizes and prices tab |
+| 14. Sizes | Product, then the Sizes tab. Optional. Prices are never shown on the website. |
 | 15. Publish or hide | The green Publish button. To hide, set "Show on website?" to Hidden on the "Where it appears" tab, then Publish. |
 | 16. Homepage | Home Page |
 | 17. Site settings | Site Settings |
@@ -264,10 +264,13 @@ Web3Forms receives the form from the visitor's browser and emails it to the inbo
 3. Copy the access key from the email.
 4. In Cloudflare, add it as `PUBLIC_WEB3FORMS_KEY` under Variables and Secrets, then redeploy, because variables are only read during a build.
 5. Add the same key to your local `.env`.
-6. Open any product page on the live site, choose a size, press **Enquire About This Product**, choose **Enquire via Email**, and submit a test.
-7. Confirm that the message reaches felthandicraftnepal@gmail.com with the subject `Product Enquiry – [Product Name]`, and check the Spam folder the first time. Mark it as "Not spam" if necessary.
+6. **Turn on the captcha check.** Both email forms (the product enquiry and the contact page) show an hCaptcha check, using Web3Forms' own free-plan hCaptcha key. In the Web3Forms dashboard, open the access key's settings and choose **hCaptcha** as the spam protection, so that Web3Forms rejects any submission without a solved check. Without this step the check still appears, but Web3Forms does not enforce it.
+7. Open any product page on the live site, choose a size, press **Enquire About This Product**, choose **Enquire via Email**, complete the check, and submit a test.
+8. Confirm that the message reaches felthandicraftnepal@gmail.com with the subject `Product Enquiry – [Product Name]`, and check the Spam folder the first time. Mark it as "Not spam" if necessary.
 
-Web3Forms' access key is designed to be visible in the page, and it can only send mail to its own inbox. It is not a private credential. Spam is reduced by a hidden honeypot field in the form.
+Web3Forms' access key is designed to be visible in the page, and it can only send mail to its own inbox. It is not a private credential. Spam is reduced by the hCaptcha check and by a hidden honeypot field.
+
+The hCaptcha script is loaded from hcaptcha.com only when a visitor starts filling in a form, so other pages load no third-party scripts. `public/_headers` allows `hcaptcha.com` and `*.hcaptcha.com` in its Content-Security-Policy for this. If the check cannot load, for example because of an ad blocker, the form shows the email and WhatsApp alternatives.
 
 If a submission fails, the visitor sees a link to email the same details and a link to WhatsApp.
 
@@ -298,7 +301,7 @@ If a submission fails, the visitor sees a link to email the same details and a l
 5. Paste a product address into the search bar at the top to inspect it, and choose **Request indexing** for important pages.
 6. Run a live product page and the home page through Google's Rich Results Test at search.google.com/test/rich-results.
 
-Products marked as having sample prices have no price in their structured data, so they will not qualify for product rich results until the real prices are in.
+The site deliberately publishes no prices, because prices are agreed after contact. Product structured data therefore has no `offers`, so the Rich Results Test will report the products as not eligible for product rich results, with a warning about the missing offer. That is expected and does not affect normal search listings. Breadcrumbs remain eligible.
 
 ---
 
@@ -312,9 +315,7 @@ Everything here is done in the Studio, followed by Publish. Wait a minute or two
 | Replace photographs | Open the item, click the photo, then replace it, and update the alt text |
 | Add a category | Categories, pencil icon. Set Display order. |
 | Add a product | Products by category, pick one, pencil icon |
-| Change a price | Product, Sizes and prices tab |
-| Change sizes | Same tab. Drag to reorder. The first is selected by default. |
-| Remove the sample label | Product, Sizes and prices tab, untick "These prices are only examples" |
+| Change sizes | Product, Sizes tab. Drag to reorder. The first is selected by default. |
 | Update descriptions and tags | Product, Details tab |
 | Hide a product | Product, Where it appears tab, set to Hidden |
 | Update contact information | Site Settings. If the email changes, also create a new Web3Forms key for it. |
@@ -334,6 +335,7 @@ Everything here is done in the Studio, followed by Publish. Wait a minute or two
 | **Failed static build** | Open the failed deployment's log in Cloudflare and read the first error. Confirm `NODE_VERSION` is `24`. Run `npm run build` locally to reproduce it. |
 | **Webhook does not fire** | In Sanity, read the webhook's attempts log. Confirm the URL, method POST, dataset and filter. Replace the deploy hook if it was deleted. |
 | **Email submission error** | Confirm `PUBLIC_WEB3FORMS_KEY` is set for Production, then redeploy. Check for a monthly limit in Web3Forms and check Spam in Gmail. |
+| **Captcha check does not appear** | Check the browser console for a Content-Security-Policy error and confirm `public/_headers` still allows `hcaptcha.com`. Ad blockers can also block it, and the form then offers email and WhatsApp links. |
 | **Domain or DNS problems** | Confirm the nameservers at the registrar match Cloudflare's. Check Custom domains in the Pages project shows Active. Allow time for changes to spread. |
 | **A product page is missing** | Confirm it is Published in Sanity, "Show on website?" is Published, its category is not Hidden, and it has at least one size. |
 | **Stale content after publishing** | Check Deployments in Cloudflare and wait for the build to finish, then reload with Ctrl+F5. If no build started, see the webhook row above. |
@@ -350,6 +352,7 @@ The intended running cost is $0 per month, excluding domain registration. Free p
 | Sanity (Free) | 20 user seats, 2 public datasets, 10,000 documents, 1 million API CDN requests and 250,000 API requests a month, 100 GB assets, 100 GB bandwidth a month | Heavy image traffic could reach the bandwidth limit. The Free plan does not permit overage: service is restricted until the quota resets or you upgrade. | sanity.io/pricing and Sanity's quota documentation, November 2026 |
 | Cloudflare Pages (Free) | 500 builds a month, 1 build at a time, 20-minute build timeout, 20,000 files per site, 25 MiB per file, 100 custom domains per project | More than 500 publishes in a month would queue no further builds until the next month. Cloudflare's limits page does not state a request limit for static files. | developers.cloudflare.com/pages/platform/limits, November 2026 |
 | Web3Forms (Free) | Reported by third-party sites as 250 submissions a month. **Not confirmed**, because the official pricing page could not be read when this guide was written. | Check the current limit on web3forms.com. A busy month could exceed it, after which forms may fail and show the fallback links. | Third-party sources only |
+| hCaptcha through Web3Forms | Included with the Web3Forms free plan, using Web3Forms' site key. Other captcha providers such as Turnstile and reCAPTCHA are Web3Forms Pro features. | None while the free hCaptcha is used | docs.web3forms.com, November 2026 |
 | WhatsApp click-to-chat | No charge for wa.me links | None | n/a |
 | GitHub | Private repositories on the free plan | None expected at this size | n/a |
 | Cloudflare Email Routing (optional) | Receiving and forwarding only. Sending to arbitrary recipients requires a paid Workers plan. | Only if outbound sending is added | developers.cloudflare.com, November 2026 |
@@ -380,7 +383,7 @@ Things to know:
 
 ## What is still sample content
 
-- All 23 products are marked "These prices are only examples". The 6 products beginning with "Sample" are demonstration items. Delete them once real products exist.
+- The 6 products beginning with "Sample" are demonstration items. Delete them once real products exist.
 - Text beginning "Sample text" on the Home Page and About Page needs the owner's own words.
 - Category descriptions begin with "Sample text" and need checking.
 

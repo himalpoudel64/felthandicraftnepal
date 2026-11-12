@@ -10,7 +10,7 @@ export const product = defineType({
   groups: [
     { name: "content", title: "Details", default: true },
     { name: "photos", title: "Photos" },
-    { name: "sizes", title: "Sizes and prices" },
+    { name: "sizes", title: "Sizes" },
     { name: "display", title: "Where it appears" },
     { name: "seo", title: "Google and sharing" },
   ],
@@ -118,10 +118,11 @@ export const product = defineType({
     }),
     defineField({
       name: "sizes",
-      title: "Sizes and prices",
+      title: "Sizes (optional)",
       type: "array",
       group: "sizes",
-      description: "At least one. The first size is selected when the page opens.",
+      description:
+        "Visitors pick one when they enquire. The first is selected when the page opens. Prices are never shown on the website: they are agreed after contact.",
       of: [
         defineArrayMember({
           type: "object",
@@ -134,30 +135,10 @@ export const product = defineType({
               description: "For example, Small.",
               validation: (rule) => rule.required(),
             }),
-            defineField({
-              name: "price",
-              title: "Price in NPR",
-              type: "number",
-              description: "Numbers only, such as 650.",
-              validation: (rule) => rule.required().integer().positive(),
-            }),
           ],
-          preview: {
-            select: { title: "label", price: "price" },
-            prepare: ({ title, price }) => ({ title, subtitle: `NPR ${price ?? "not set"}` }),
-          },
+          preview: { select: { title: "label" } },
         }),
       ],
-      validation: (rule) => rule.required().min(1).error("Please add at least one size."),
-    }),
-    defineField({
-      name: "samplePrice",
-      title: "These prices are only examples",
-      type: "boolean",
-      group: "sizes",
-      description:
-        "While ticked, the website labels the price as a sample, hides it on product cards and keeps it away from Google. Untick it once the real prices are entered.",
-      initialValue: false,
     }),
     { ...statusField, group: "display" },
     defineField({
@@ -202,18 +183,12 @@ export const product = defineType({
     select: {
       title: "name",
       status: "status",
-      price: "sizes.0.price",
-      sample: "samplePrice",
       category: "category.title",
       media: "images.0",
     },
-    prepare: ({ title, status, price, sample, category, media }) => ({
+    prepare: ({ title, status, category, media }) => ({
       title,
-      subtitle: [
-        status === "hidden" ? "Hidden" : null,
-        category,
-        price ? `NPR ${price}${sample ? " (sample)" : ""}` : "No price yet",
-      ]
+      subtitle: [status === "hidden" ? "Hidden" : null, category]
         .filter(Boolean)
         .join(" · "),
       media,

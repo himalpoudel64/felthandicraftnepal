@@ -54,7 +54,9 @@ studio/seed       Starting content and photographs for import
 public/seed       Image variants, used only when building from the seed file
 ```
 
-All content comes from one GROQ query in `src/lib/queries.ts`, run once per build. The build stops if Sanity cannot be reached or nothing is published, so a broken build never replaces a working site, and it prints any missing images, alt text, sample prices and temporary stock photos.
+All content comes from one GROQ query in `src/lib/queries.ts`, run once per build. The build stops if Sanity cannot be reached or nothing is published, so a broken build never replaces a working site, and it prints any missing images, alt text and temporary stock photos.
+
+The site shows no prices: they are agreed after contact. Both email forms are protected by hCaptcha through Web3Forms, loaded only when a visitor starts filling in a form.
 
 ## Performance
 

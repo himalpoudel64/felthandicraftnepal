@@ -6,7 +6,6 @@ import PortableText from "../../../components/PortableText.astro";
 import ProductCard from "../../../components/ProductCard.astro";
 import ProductGallery from "../../../components/ProductGallery.astro";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
-import { formatPrice } from "../../../lib/format";
 import { imageProps } from "../../../lib/images";
 import { categoryPath, productPath } from "../../../lib/paths";
 import { getContent, relatedTo } from "../../../lib/sanity";
@@ -26,8 +25,6 @@ const { settings, products } = await getContent();
 const crumbs = productCrumbs(product);
 const related = relatedTo(product, products);
 const GALLERY_SIZES = "(min-width: 1024px) 54vw, 100vw";
-const first = product.sizes[0] as Product["sizes"][number];
-const display = (price: number) => `${formatPrice(price)}${product.samplePrice ? " (sample price)" : ""}`;
 const lcp = imageProps(product.images?.[0], { sizes: GALLERY_SIZES });
 ---
 
@@ -51,30 +48,24 @@ const lcp = imageProps(product.images?.[0], { sizes: GALLERY_SIZES });
         <h1 class="mt-3 text-section">{product.name}</h1>
         {product.shortDescription && <p class="mt-4 text-lead">{product.shortDescription}</p>}
 
-        <div class="mt-6 border-t border-rule pt-5">
-          <p class="text-sm text-ink-soft">Price for size <span data-size-output>{first.label}</span></p>
-          <p class="mt-1 font-serif text-sub" data-price-output aria-live="polite" aria-atomic="true">{display(first.price)}</p>
-          {product.samplePrice && <p class="mt-1 text-sm text-ink-soft">This is a sample price. Please ask us for the current price.</p>}
-        </div>
-
-        <fieldset data-sizes class="mt-5">
-          <legend class="mb-2 text-sm font-medium">Available sizes</legend>
-          <div class="flex flex-wrap gap-2">
-            {
-              product.sizes.map((size, i) => (
-                <label class="size-option cursor-pointer">
-                  <input type="radio" name="size" class="sr-only" value={size.label} data-display={display(size.price)} checked={i === 0} />
-                  <span class="block min-h-11 border border-line px-4 py-2 leading-tight transition-colors hover:border-ink">
-                    <span class="block font-medium">{size.label}</span>
-                    <span class="block text-sm">{formatPrice(size.price)}</span>
-                  </span>
-                </label>
-              ))
-            }
-          </div>
-        </fieldset>
+        {
+          product.sizes.length > 0 && (
+            <fieldset data-sizes class="mt-6 border-t border-rule pt-5">
+              <legend class="float-left mb-2 w-full text-sm font-medium">Available sizes</legend>
+              <div class="clear-both flex flex-wrap gap-2">
+                {product.sizes.map((size, i) => (
+                  <label class="size-option cursor-pointer">
+                    <input type="radio" name="size" class="sr-only" value={size.label} checked={i === 0} />
+                    <span class="flex min-h-11 items-center border border-line px-4 py-2 font-medium leading-tight transition-colors hover:border-ink">{size.label}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          )
+        }
 
         <button type="button" data-open-enquiry class="btn btn-primary mt-6 w-full">Enquire About This Product</button>
+        <p class="mt-3 text-sm text-ink-soft">Prices depend on quantity and are agreed directly with you. Retail and wholesale enquiries are both welcome.</p>
 
         {
           (product.tags?.length ?? 0) > 0 && (

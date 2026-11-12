@@ -89,7 +89,11 @@ async function readSeed(): Promise<Raw> {
 }
 
 function normalise(raw: Raw): Content {
-  if (!raw.settings) throw new Error("Content error: publish the Site Settings document in the Studio.");
+  if (!raw.settings) {
+    throw new Error(
+      "Content error: Site Settings was not found in Sanity. For a new project, load the starting content by running `npx sanity login` and then `npm run seed` in the studio folder. Otherwise, publish Site Settings in the Studio.",
+    );
+  }
   if (!raw.home) throw new Error("Content error: publish the Home Page document in the Studio.");
   if (!raw.categories?.length) throw new Error("Content error: no published categories were found.");
 
@@ -98,11 +102,11 @@ function normalise(raw: Raw): Content {
   for (const { relatedProducts, ...product } of raw.products ?? []) {
     const category = categoriesById.get(product.category);
     // A product in a hidden category disappears with it.
-    if (!category || !product.sizes?.length) continue;
+    if (!category) continue;
     products.push({
       ...product,
       category,
-      sizes: product.sizes,
+      sizes: (product.sizes ?? []).filter((size) => size.label?.trim()),
       additionalCategories: (product.additionalCategories ?? []).filter((id) => categoriesById.has(id)),
       related: relatedProducts ?? [],
     });
@@ -139,7 +143,10 @@ let content: Promise<Content> | undefined;
 
 /** All site content, fetched once per build. A failed fetch fails the build, so the live site stays up. */
 export function getContent(): Promise<Content> {
-  content ??= (async () => normalise(projectId ? await fetchFromSanity(projectId) : await readSeed()))();
+  const load = async () => normalise(projectId ? await fetchFromSanity(projectId) : await readSeed());
+  // The dev server is long-running, so it must pick up new content and recover from failures.
+  if (import.meta.env.DEV) return load();
+  content ??= load();
   return content;
 }
 
@@ -173,8 +180,6 @@ export function reportContentProblems({ settings, home, about, categories, produ
     p.images?.forEach((image, i) => check(`Product "${p.name}" photo ${i + 1}`, image));
   });
 
-  const samples = products.filter((p) => p.samplePrice);
-  if (samples.length) console.warn(`\n[content] ${samples.length} products are marked as having sample prices.`);
   if (stock.length) console.warn(`[content] Temporary stock photos still in use: ${stock.join("; ")}`);
   if (!projectId) console.warn("[content] Built from the seed file, not from Sanity.");
   if (!import.meta.env.PUBLIC_WEB3FORMS_KEY) console.warn("[content] PUBLIC_WEB3FORMS_KEY is not set: forms offer an email link.");

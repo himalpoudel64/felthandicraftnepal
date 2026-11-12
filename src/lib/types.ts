@@ -18,7 +18,7 @@ export type ImageData = {
   asset?: { _id: string; width: number; height: number } | null;
 };
 
-export type Size = { label: string; price: number };
+export type Size = { label: string };
 export type Spec = { label: string; value: string };
 export type TitledText = { title: string; text: string };
 
@@ -46,7 +46,6 @@ export type RawProduct = Seo & {
   tags?: string[];
   specifications?: Spec[];
   sizes?: Size[];
-  samplePrice?: boolean;
   featured?: boolean;
   relatedProducts?: string[];
 };

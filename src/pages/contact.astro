@@ -9,7 +9,7 @@ const { settings } = await getContent();
 const whatsapp = whatsappUrl(settings.whatsappNumber, GENERAL_MESSAGE);
 const steps = [
   ["Tell us what you need", "A single piece, a wholesale quantity or a custom design."],
-  ["We reply with details", "We confirm prices, sizes and what is possible."],
+  ["We reply with details", "We discuss quantities, sizes and terms with you directly."],
   ["Agree the order together", "Everything is arranged directly with us. There is no online payment."],
 ];
 const address = settings.address && Object.values(settings.address).filter(Boolean).join(", ");

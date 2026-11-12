@@ -40,8 +40,8 @@ export const siteQuery = `{
       "images": images[]${image},
       shortDescription, description, tags,
       specifications[]{ label, value },
-      sizes[]{ label, price },
-      samplePrice, featured,
+      sizes[]{ label },
+      featured,
       "relatedProducts": relatedProducts[]._ref,
       ${seo}
     }

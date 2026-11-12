@@ -26,19 +26,19 @@ After you publish, the website rebuilds itself. This takes a minute or two. Then
 5. Add **Tags** if you like, such as Christmas. Visitors can filter by them.
 6. Open the **Photos** tab and add your photos. The first is the main one. Drag them to change the order.
 7. Click each photo and fill in **Alt text**. This is a short description of the photo, such as "Red felt purse with a brass zip, held in one hand". The Studio will not let you publish without it.
-8. Open the **Sizes and prices** tab and add at least one size.
+8. If the product comes in sizes, open the **Sizes** tab and add them. This is optional.
 9. Press **Publish**.
 
-## Add or change a size and price
+## Add or change sizes
 
-1. Open the product and click the **Sizes and prices** tab.
+1. Open the product and click the **Sizes** tab.
 2. Click **Add item**, or click an existing size to change it.
-3. Type the **Size**, such as Medium, and the **Price in NPR**, using numbers only, such as 650.
+3. Type the **Size**, such as Medium.
 4. Close the small window and press **Publish**.
 
-The first size in the list is the one shown when the page opens. Drag sizes to change the order.
+The first size in the list is selected when the page opens, and the size a visitor picks is included in their enquiry. Drag sizes to change the order.
 
-**Sample prices:** every product starts with an example price of NPR 450, marked with a tick beside "These prices are only examples". When you enter the real price, **remove that tick** and press Publish. While the tick is there, the website says "sample price" and hides the price on product cards.
+**Prices are never shown on the website.** Visitors ask about a product by WhatsApp or email, and you agree the price with them, whether it is one piece or a wholesale order.
 
 ## Hide a product or category
 
@@ -74,7 +74,7 @@ The best photographs show real hands and faces at work: shaping wool, stitching,
 - **Products starting with "Sample":** these are examples. Delete them, or edit them into real products.
 - **Coloured blocks saying "Photograph coming soon":** these mean a photo has not been added yet.
 - **Only write what is true.** Please do not add reviews, awards or figures you cannot back up. The **Verified figures** box on the Home Page stays hidden until you add a number you can prove.
-- **Enquiries** arrive at your email address. They are not stored in the Studio. Please check your Spam folder the first time.
+- **Enquiries** arrive at your email address. They are not stored in the Studio. Please check your Spam folder the first time. Visitors complete a short "I am human" check before an email enquiry is sent, which keeps out automated spam.
 - **WhatsApp number:** digits only in Site Settings, starting with 977, with no plus sign or spaces.
 - **Web address:** changing the address of a published product breaks links people have saved. Ask your developer first.
 - **SEO fields** are optional. If you leave them empty, the website writes sensible ones for you.

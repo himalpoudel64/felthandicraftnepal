@@ -1,7 +1,7 @@
 ---
 import { absoluteUrl, productPath } from "../lib/paths";
 import type { Product, Settings } from "../lib/types";
-import { GENERAL_MESSAGE, whatsappUrl } from "../lib/whatsapp";
+import { productMessage, whatsappUrl } from "../lib/whatsapp";
 import EmailEnquiryForm from "./EmailEnquiryForm.astro";
 import WhatsAppIcon from "./WhatsAppIcon.astro";
 
@@ -11,6 +11,12 @@ interface Props {
 }
 const { product, settings } = Astro.props;
 const url = absoluteUrl(productPath(product));
+const hasSizes = product.sizes.length > 0;
+const firstSize = product.sizes[0]?.label ?? "";
+const initialWhatsapp = whatsappUrl(
+  settings.whatsappNumber,
+  productMessage({ businessName: settings.businessName, product: product.name, category: product.category.title, size: firstSize, url }),
+);
 const optionClass = "flex min-h-24 w-full items-center gap-4 border border-ink p-4 text-left transition-colors hover:bg-ink hover:text-ivory";
 ---
 
@@ -32,12 +38,12 @@ const optionClass = "flex min-h-24 w-full items-center gap-4 border border-ink p
       </button>
     </div>
     <p class="mt-2 border-y border-rule py-3 text-[0.9375rem]">
-      <span class="font-medium">{product.name}</span><br />
-      Size: <span data-summary-size></span> · <span data-summary-price></span>
+      <span class="font-medium">{product.name}</span>
+      {hasSizes && <><br />Size: <span data-summary-size>{firstSize}</span></>}
     </p>
 
     <div data-view="choice" class="mt-5 space-y-3">
-      <a data-whatsapp href={whatsappUrl(settings.whatsappNumber, GENERAL_MESSAGE)} target="_blank" rel="noopener" class={optionClass}>
+      <a data-whatsapp href={initialWhatsapp} target="_blank" rel="noopener" class={optionClass}>
         <WhatsAppIcon class="h-8 w-8 shrink-0 text-whatsapp" />
         <span>
           <span class="block font-medium">Enquire via WhatsApp</span>
@@ -59,8 +65,8 @@ const optionClass = "flex min-h-24 w-full items-center gap-4 border border-ink p
         idPrefix="dialog"
         email={settings.email}
         businessName={settings.businessName}
-        whatsappUrl={whatsappUrl(settings.whatsappNumber, GENERAL_MESSAGE)}
-        product={{ name: product.name, category: product.category.title, url }}
+        whatsappUrl={initialWhatsapp}
+        product={{ name: product.name, category: product.category.title, url, hasSizes }}
       />
     </div>
   </div>
@@ -70,33 +76,23 @@ const optionClass = "flex min-h-24 w-full items-center gap-4 border border-ink p
   import { productMessage, whatsappUrl } from "../lib/whatsapp";
 
   const dialog = document.querySelector<HTMLDialogElement>("dialog[data-enquiry]");
-  const sizes = document.querySelector<HTMLElement>("[data-sizes]");
 
-  if (dialog && sizes) {
+  if (dialog) {
     const $ = <T extends HTMLElement>(selector: string) => dialog.querySelector<T>(selector);
+    const sizes = document.querySelector<HTMLElement>("[data-sizes]");
     const choice = $("[data-view=choice]");
     const email = $("[data-view=email]");
-    const priceOutput = document.querySelector<HTMLElement>("[data-price-output]");
-    const sizeOutput = document.querySelector<HTMLElement>("[data-size-output]");
 
-    const selected = () => {
-      const input = sizes.querySelector<HTMLInputElement>("input:checked");
-      return { size: input?.value ?? "", price: input?.dataset.display ?? "" };
-    };
+    const selectedSize = () => sizes?.querySelector<HTMLInputElement>("input:checked")?.value ?? "";
 
-    /** Keeps the visible price, the summary, the form and the WhatsApp link in step. */
+    /** Keeps the summary, the form and the WhatsApp link in step with the chosen size. */
     function sync() {
-      const { size, price } = selected();
-      if (priceOutput) priceOutput.textContent = price;
-      if (sizeOutput) sizeOutput.textContent = size;
+      const size = selectedSize();
       const summarySize = $("[data-summary-size]");
-      const summaryPrice = $("[data-summary-price]");
       if (summarySize) summarySize.textContent = size;
-      if (summaryPrice) summaryPrice.textContent = price;
       $<HTMLInputElement>("[data-field-size]")?.setAttribute("value", size);
-      $<HTMLInputElement>("[data-field-price]")?.setAttribute("value", price);
       const { number = "", business = "", product = "", category = "", url = "" } = dialog!.dataset;
-      const href = whatsappUrl(number, productMessage({ businessName: business, product, category, size, price, url }));
+      const href = whatsappUrl(number, productMessage({ businessName: business, product, category, size, url }));
       $("[data-whatsapp]")?.setAttribute("href", href);
     }
 
@@ -107,7 +103,7 @@ const optionClass = "flex min-h-24 w-full items-center gap-4 border border-ink p
       else $("[data-show-email]")?.focus();
     }
 
-    sizes.addEventListener("change", sync);
+    sizes?.addEventListener("change", sync);
     document.querySelector("[data-open-enquiry]")?.addEventListener("click", () => {
       sync();
       if (choice) choice.hidden = false;
@@ -122,7 +118,7 @@ const optionClass = "flex min-h-24 w-full items-center gap-4 border border-ink p
     dialog.addEventListener("click", (event) => {
       if (event.target === dialog) dialog.close();
     });
-    // form.reset() restores attribute values, so size and price stay filled in.
+    // form.reset() restores attribute values, so the size stays filled in.
     sync();
   }
 </script>

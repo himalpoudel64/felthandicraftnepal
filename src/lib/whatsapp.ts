@@ -11,19 +11,18 @@ export type ProductEnquiry = {
   businessName: string;
   product: string;
   category: string;
+  /** Empty when the product has no sizes listed. */
   size: string;
-  price: string;
   url: string;
 };
 
-export function productMessage({ businessName, product, category, size, price, url }: ProductEnquiry): string {
+export function productMessage({ businessName, product, category, size, url }: ProductEnquiry): string {
   return [
     `Namaste! I am interested in the following product from ${businessName}.`,
     "",
     `Product: ${product}`,
     `Category: ${category}`,
-    `Selected Size: ${size}`,
-    `Price: ${price}`,
+    ...(size ? [`Selected Size: ${size}`] : []),
     "",
     `Product Link: ${url}`,
     "",
